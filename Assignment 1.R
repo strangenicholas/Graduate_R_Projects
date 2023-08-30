@@ -22,6 +22,18 @@ wvs <-
     inc = if_else(X047CS >= 840051 &
                     X047CS <= 840060, X047CS - 840050, inc),
     hinc = if_else(inc >= 8, 1, 0)
+    # A008, 
+    # E179, 
+    # A030, 
+    # A038, 
+    # C011-C021, 
+    # E045, 
+    # E039, 
+    # X001, 
+    # X003,
+    # X007, 
+    # X025, 
+    # X028
   ) %>%
   select(year, S003, trust, X047CS, inc, hinc)
 
