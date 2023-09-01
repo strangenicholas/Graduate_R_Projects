@@ -32,11 +32,16 @@ wvs <-
                     X047CS <= 840050, X047CS - 840040, inc),
     inc = if_else(X047CS >= 840051 &
                     X047CS <= 840060, X047CS - 840050, inc),
-    hinc = if_else(inc >= 8, 1, 0)
-    # A008, 
+    hinc = if_else(inc >= 8, 1, 0),
+    happy = if_else(A008 >= 1, 1, 0), # A008 - Happiness
+    happy = replace(happy, A165 < 1, NA),
     # E179, 
-    # A030, 
-    # A038, 
+    hardwork = if_else(A030 == 1,1,0),
+    hardwork = replace(hardwork, A030 < 1, NA),
+    thrift = if_else(A038 == 1,1,0),
+    thrift = replace(thrift, A038 < 1, NA),
+    pay = if_else(C011 == 1,1,0),
+    pay = replace(pay, C011 < 1, NA),
     # C011-C021, 
     # E045, 
     # E039, 
@@ -46,11 +51,11 @@ wvs <-
     # X025, 
     # X028
   ) %>%
-  select(year, S003, trust, X047CS, inc, hinc)
+  select(year, S003, trust, X047CS, inc, hinc, happy, E179, hardwork, thrift, pay)
 
 View(wvs)
 
-summary(wvs)
+# summary(wvs)
 
 
 
