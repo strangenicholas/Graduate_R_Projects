@@ -40,8 +40,12 @@ wvs <-
     hardwork = replace(hardwork, A030 < 1, NA),
     thrift = if_else(A038 == 1,1,0),
     thrift = replace(thrift, A038 < 1, NA),
-    pay = if_else(C011 == 1,1,0),
-    pay = replace(pay, C011 < 1, NA),
+    jobpay = if_else(C011 == 1,1,0),
+    jobpay = replace(pay, C011 < 1, NA),
+    jobpressure = if_else(C012 == 1,1,0),
+    jobpressure = replace(jobpressure, C012 < 1, NA),
+    jobsecurity = if_else(C013 == 1,1,0),
+    jobsecurity = replace(jobsecurity, C013 < 1, NA),
     # C011-C021, 
     # E045, 
     # E039, 
@@ -51,7 +55,7 @@ wvs <-
     # X025, 
     # X028
   ) %>%
-  select(year, S003, trust, X047CS, inc, hinc, happy, E179, hardwork, thrift, pay)
+  select(year, S003, trust, X047CS, inc, hinc, happy, E179, hardwork, thrift, jobpay, jobpressure, jobsecurity)
 
 View(wvs)
 
