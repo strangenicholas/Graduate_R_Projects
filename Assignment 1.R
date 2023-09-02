@@ -33,7 +33,7 @@ wvs <-
     inc = if_else(X047CS >= 840051 &
                     X047CS <= 840060, X047CS - 840050, inc),
     hinc = if_else(inc >= 8, 1, 0),
-    happy = if_else(A008 >= 1, 1, 0), # A008 - Happiness
+    happy = if_else(A008 >= 1, 1, 0),
     happy = replace(happy, A165 < 1, NA),
     # E179, 
     hardwork = if_else(A030 == 1,1,0),
@@ -41,12 +41,27 @@ wvs <-
     thrift = if_else(A038 == 1,1,0),
     thrift = replace(thrift, A038 < 1, NA),
     jobpay = if_else(C011 == 1,1,0),
-    jobpay = replace(pay, C011 < 1, NA),
+    jobpay = replace(jobpay, C011 < 1, NA),
     jobpressure = if_else(C012 == 1,1,0),
     jobpressure = replace(jobpressure, C012 < 1, NA),
     jobsecurity = if_else(C013 == 1,1,0),
     jobsecurity = replace(jobsecurity, C013 < 1, NA),
-    # C011-C021, 
+    jobrespected = if_else(C014 == 1,1,0),
+    jobrespected = replace(jobrespected, C014 < 1, NA),
+    jobhours = if_else(C015 == 1,1,0),
+    jobhours = replace(jobhours, C015 < 1, NA),
+    jobinitiative = if_else(C016 == 1,1,0),
+    jobinitiative = replace(jobinitiative, C016 < 1, NA),
+    jobholidays = if_else(C017 == 1,1,0),
+    jobholidays = replace(jobholidays, C017 < 1, NA),
+    jobachieve = if_else(C018 == 1,1,0),
+    jobachieve = replace(jobachieve, C018 < 1, NA),
+    jobresponsible = if_else(C019 == 1,1,0),
+    jobresponsible = replace(jobresponsible, C019 < 1, NA),
+    jobinteresting = if_else(C020 == 1,1,0),
+    jobinteresting = replace(jobinteresting, C020 < 1, NA),
+    jobdoable = if_else(C021 == 1,1,0),
+    jobdoable = replace(jobdoable, C021 < 1, NA)
     # E045, 
     # E039, 
     # X001, 
@@ -55,7 +70,8 @@ wvs <-
     # X025, 
     # X028
   ) %>%
-  select(year, S003, trust, X047CS, inc, hinc, happy, E179, hardwork, thrift, jobpay, jobpressure, jobsecurity)
+  select(year, S003, trust, X047CS, inc, hinc, happy, E179, hardwork, thrift, jobpay, jobpressure, jobsecurity, jobrespected,
+         jobhours, jobinitiative, jobholidays, jobachieve, jobresponsible, jobdoable)
 
 View(wvs)
 
