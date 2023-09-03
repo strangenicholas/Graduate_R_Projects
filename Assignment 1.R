@@ -1,20 +1,20 @@
 library(dplyr)
 library(haven)
 
-# Instructions
-# A) Expand the mutate-statement by creating additional variables corresponding to the
-# following columns: A008, E179, A030, A038, C011-C021, E045, E039, X001, X003,
-# X007, X025, X028. Chose names of the variables that are both concise and informative.
-# Make sure the values are aligned with the concept being represented and NA-values are
-# coded correctly.
 
-# C) Tabulate the averages from B. You could do it in MS Word. Visualize the averages
-# from B using some of the R tools (you need to do your own research for this part).
+
+
 
 ## Read in data
 wvs <-
   read_sas("C:/Users/nicho/OneDrive/UCF MS - FinTech/FIN 6779/wvs_dataset.sas7bdat")
 as.data.frame(wvs)
+
+# A) Expand the mutate-statement by creating additional variables corresponding to the
+# following columns: A008, E179, A030, A038, C011-C021, E045, E039, X001, X003,
+# X007, X025, X028. Chose names of the variables that are both concise and informative.
+# Make sure the values are aligned with the concept being represented and NA-values are
+# coded correctly.
 
 wvs <-
   wvs %>%
@@ -116,6 +116,9 @@ summary(wvs)
 # B) Based on the variable X001, construct averages of all other variables across male and
   # female respondents (summarize).
 aggregate(. ~ sex, wvs, mean)
+
+# C) Tabulate the averages from B. You could do it in MS Word. Visualize the averages
+# from B using some of the R tools (you need to do your own research for this part).
 
 
 # tempdir()
