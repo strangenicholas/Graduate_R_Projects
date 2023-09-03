@@ -72,10 +72,13 @@ wvs <-
     sex = replace(sex, sex == 1, "Male"),
     sex = replace(sex, sex == 2, "Female"),
     age = X003,
-    age = replace(age, age < 1, NA)
-    # X007,
-    # X025,
-    # X028
+    age = replace(age, age < 1, NA),
+    relationship = if_else(X007 %in% c(1, 2, 8), 1, 0),
+    relationship = replace(relationship, X007 < 1, NA),
+    higheducation = if_else(X025 >= 6, 1, 0),
+    higheducation = replace(higheducation,X007 < 1, NA),
+    employed = if_else(X028 %in% c(1, 2, 3), 1, 0),
+    employed = replace(employed, X028 < 1, NA)
   ) %>%
   select(
     year,
@@ -101,9 +104,17 @@ wvs <-
     risktolerance,
     competitionharm,
     sex,
-    age
+    age,
+    relationship,
+    higheducation,
+    employed
   )
 
 View(wvs)
 
 # summary(wvs)
+
+# wvs <-
+#   read_sas("C:/Users/nicho/OneDrive/UCF MS - FinTech/FIN 6779/wvs_dataset.sas7bdat")
+# as.data.frame(wvs)
+# unique(wvs$X025)
