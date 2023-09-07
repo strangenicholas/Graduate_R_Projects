@@ -67,9 +67,9 @@ wvs <-
     competitionharm = E045,
     competitionharm = replace(competitionharm, competitionharm < 1, NA),
     sex = X001,
-    sex = replace(sex, sex < 1, NA),
-    sex = replace(sex, sex == 1, "Male"),
-    sex = replace(sex, sex == 2, "Female"),
+    # sex = replace(sex, sex < 1, NA),
+    # sex = replace(sex, sex == 1, "Male"),
+    # sex = replace(sex, sex == 2, "Female"),
     age = X003,
     age = replace(age, age < 1, NA),
     relationship = if_else(X007 %in% c(1, 2, 8), 1, 0),
@@ -115,7 +115,10 @@ summary(wvs)
 
 # B) Based on the variable X001, construct averages of all other variables across male and
   # female respondents (summarize).
-aggregate(. ~ sex, wvs, mean)
+# aggregate(. ~ sex, wvs, mean)
+result <- wvs %>%
+  group_by(sex) %>%
+  summarize(across(where(is.numeric), mean, na.rm = TRUE))
 
 # C) Tabulate the averages from B. You could do it in MS Word. Visualize the averages
 # from B using some of the R tools (you need to do your own research for this part).
