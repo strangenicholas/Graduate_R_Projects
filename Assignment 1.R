@@ -121,6 +121,14 @@ View(SummarybySex)
 # from B using some of the R tools (you need to do your own research for this part).
 
 
+# Income by sex
+library(ggplot2)
+
+p <- ggplot(wvs, aes(x=inc)) + geom_histogram()
+
+p
+
+
 # tempdir()
 # dir.create(tempdir())
 # wvs <-
