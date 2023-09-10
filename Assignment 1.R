@@ -32,44 +32,35 @@ wvs <-
     inc = if_else(X047CS >= 840051 &
                     X047CS <= 840060, X047CS - 840050, inc),
     hinc = if_else(inc >= 8, 1, 0),
-    happy = if_else(A008 >= 1, 1, 0),
+    happy = if_else(A008 %in% c(1, 2), 1, 0),
     happy = replace(happy, A165 < 1, NA),
     vote = if_else(E179 >= 5 | E179 == 3, 1, 0),
     vote = replace(vote, E179 <= 1, NA),
-    hardwork = if_else(A030 == 1, 1, 0),
-    hardwork = replace(hardwork, A030 < 1, NA),
-    thrift = if_else(A038 == 1, 1, 0),
-    thrift = replace(thrift, A038 < 1, NA),
-    jobpay = if_else(C011 == 1, 1, 0),
-    jobpay = replace(jobpay, C011 < 1, NA),
-    jobpressure = if_else(C012 == 1, 1, 0),
-    jobpressure = replace(jobpressure, C012 < 1, NA),
-    jobsecurity = if_else(C013 == 1, 1, 0),
-    jobsecurity = replace(jobsecurity, C013 < 1, NA),
-    jobrespected = if_else(C014 == 1, 1, 0),
-    jobrespected = replace(jobrespected, C014 < 1, NA),
-    jobhours = if_else(C015 == 1, 1, 0),
-    jobhours = replace(jobhours, C015 < 1, NA),
-    jobinitiative = if_else(C016 == 1, 1, 0),
-    jobinitiative = replace(jobinitiative, C016 < 1, NA),
-    jobholidays = if_else(C017 == 1, 1, 0),
-    jobholidays = replace(jobholidays, C017 < 1, NA),
-    jobachieve = if_else(C018 == 1, 1, 0),
-    jobachieve = replace(jobachieve, C018 < 1, NA),
-    jobresponsible = if_else(C019 == 1, 1, 0),
-    jobresponsible = replace(jobresponsible, C019 < 1, NA),
-    jobinteresting = if_else(C020 == 1, 1, 0),
-    jobinteresting = replace(jobinteresting, C020 < 1, NA),
-    jobdoable = if_else(C021 == 1, 1, 0),
-    jobdoable = replace(jobdoable, C021 < 1, NA),
+    republican = if_else(E179 == 840001, 1, 0),
+    democrat = if_else(E179 == 840002, 1, 0),
+    independent = if_else(E179 == 840003, 1, 0),
+    otherparty = if_else(vote == 1 & republican == 0 & democrat == 0 & independent == 0 , 1, 0),
+    hardwork = replace(A030, A030 < 0, NA),
+    thrift = replace(A038, A038 < 0, NA),
+    jobpay = replace(C011, C011 < 0, NA),
+    jobpressure = replace(C012, C012 < 0, NA),
+    jobsecurity = replace(C013, C013 < 0, NA),
+    jobrespected = replace(C014, C014 < 0, NA),
+    jobhours = replace(C015, C015 < 0, NA),
+    jobinitiative = replace(C016, C016 < 0, NA),
+    jobholidays = replace(C017, C017 < 0, NA),
+    jobachieve = replace(C018, C018 < 0, NA),
+    jobresponsible = replace(C019, C019 < 0, NA),
+    jobinteresting = replace(C020, C020 < 0, NA),
+    jobdoable = replace(C021, C021 < 0, NA),
     risktolerance = E045,
     risktolerance = replace(risktolerance, risktolerance < 1, NA),
     competitionharm = E045,
     competitionharm = replace(competitionharm, competitionharm < 1, NA),
     sex = X001,
-    # sex = replace(sex, sex < 1, NA),
-    # sex = replace(sex, sex == 1, "Male"),
-    # sex = replace(sex, sex == 2, "Female"),
+    sex = replace(sex, sex < 1, NA),
+    sex = replace(sex, sex == 1, "Male"),
+    sex = replace(sex, sex == 2, "Female"),
     age = X003,
     age = replace(age, age < 1, NA),
     relationship = if_else(X007 %in% c(1, 2, 8), 1, 0),
@@ -81,15 +72,18 @@ wvs <-
   ) %>%
   select(
     year,
-    S003,
     trust,
-    X047CS,
     inc,
     hinc,
     happy,
     vote,
+    republican,
+    democrat,
+    independent,
+    otherparty,
     hardwork,
     thrift,
+    A038,
     jobpay,
     jobpressure,
     jobsecurity,
@@ -115,26 +109,21 @@ summary(wvs)
 
 # B) Based on the variable X001, construct averages of all other variables across male and
   # female respondents (summarize).
-# aggregate(. ~ sex, wvs, mean)
-result <- wvs %>%
+
+SummarybySex <- wvs %>%
   group_by(sex) %>%
   summarize(across(where(is.numeric), mean, na.rm = TRUE))
 
-result
+View(SummarybySex)
 
-results2 %>%
-  group_by(sex) %>%
-  summarise(across(trust:employed, ~sum(. == 'Yes')))
-results2
 
 # C) Tabulate the averages from B. You could do it in MS Word. Visualize the averages
 # from B using some of the R tools (you need to do your own research for this part).
 
-tabulate
 
 # tempdir()
 # dir.create(tempdir())
 # wvs <-
 #   read_sas("C:/Users/nicho/OneDrive/UCF MS - FinTech/FIN 6779/wvs_dataset.sas7bdat")
 # as.data.frame(wvs)
-# unique(wvs$X025)
+# unique(wvs$E179)
