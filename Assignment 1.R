@@ -120,9 +120,17 @@ result <- wvs %>%
   group_by(sex) %>%
   summarize(across(where(is.numeric), mean, na.rm = TRUE))
 
+result
+
+results2 %>%
+  group_by(sex) %>%
+  summarise(across(trust:employed, ~sum(. == 'Yes')))
+results2
+
 # C) Tabulate the averages from B. You could do it in MS Word. Visualize the averages
 # from B using some of the R tools (you need to do your own research for this part).
 
+tabulate
 
 # tempdir()
 # dir.create(tempdir())
