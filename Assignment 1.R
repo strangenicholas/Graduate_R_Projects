@@ -121,12 +121,33 @@ View(SummarybySex)
 # from B using some of the R tools (you need to do your own research for this part).
 
 
-# Income by sex
+
 library(ggplot2)
 
-p <- ggplot(wvs, aes(x=inc)) + geom_histogram()
+# Income & age
 
-p
+# Final Plot
+dx <- as.matrix(SummarybySex[-c(1, 2, 27)])  # Exclude columns 1, 2 and 27
+rownames(dx) <- SummarybySex$Sprint[-c(1, 2, 27)]
+
+# Define colors
+colours <- c("red", "blue")
+
+# Create the barplot 
+barplot(mx,
+        main = 'Summary by Sex',
+        ylab = 'Results',
+        xlab = 'Questions',
+        beside = TRUE,
+        col = colours,
+        ylim = c(0, max(dx) * 1.3),
+        names.arg = rownames(dx))  # Display row names as x-axis labels
+
+# Add a box around the plot
+box()
+
+
+
 
 
 # tempdir()
