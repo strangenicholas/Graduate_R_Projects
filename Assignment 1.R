@@ -3,8 +3,6 @@ library(haven)
 
 
 
-
-
 ## Read in data
 wvs <-
   read_sas("C:/Users/nicho/OneDrive/UCF MS - FinTech/FIN 6779/wvs_dataset.sas7bdat")
@@ -83,7 +81,6 @@ wvs <-
     otherparty,
     hardwork,
     thrift,
-    A038,
     jobpay,
     jobpressure,
     jobsecurity,
@@ -124,28 +121,30 @@ View(SummarybySex)
 
 library(ggplot2)
 
-# Income & age
 
-# Final Plot
-dx <- as.matrix(SummarybySex[-c(1, 2, 27)])  # Exclude columns 1, 2 and 27
-rownames(dx) <- SummarybySex$Sprint[-c(1, 2, 27)]
+# General Plot
+dx <- as.matrix(SummarybySex[-c(1,2,4,24, 25,26, 27)])  # Exclude columns 1, 2 and 27
+rownames(dx) <- SummarybySex$sex[-c(1, 2,4,24,25, 26, 27)]
 
 # Define colors
-colours <- c("red", "blue")
+colours <- c("pink", "blue")
 
 # Create the barplot 
-barplot(mx,
+barplot(dx,
         main = 'Summary by Sex',
         ylab = 'Results',
-        xlab = 'Questions',
         beside = TRUE,
         col = colours,
         ylim = c(0, max(dx) * 1.3),
-        names.arg = rownames(dx))  # Display row names as x-axis labels
+        names.arg = rownames(dx),
+        las = 2)  
+
+# legend("topright", legend = colnames(dx), fill = colours)
 
 # Add a box around the plot
 box()
 
+# others plot
 
 
 
