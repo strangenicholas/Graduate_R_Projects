@@ -122,7 +122,7 @@ library(ggplot2)
 
 # General Plot
 dx <-
-  as.matrix(SummarybySex[-c(1, 2, 4, 24, 25, 26, 27)])  # Exclude columns 1, 2 and 27
+  as.matrix(SummarybySex[-c(1, 2, 4, 24, 25, 26, 27)])  # Exclude outlier columns
 rownames(dx) <- SummarybySex$sex[-c(1, 2, 4, 24, 25, 26, 27)]
 
 # Define colors
@@ -140,7 +140,6 @@ barplot(
   las = 2
 )
 
-# legend("topright", legend = colnames(dx), fill = colours)
 
 # Add a box around the plot
 box()
