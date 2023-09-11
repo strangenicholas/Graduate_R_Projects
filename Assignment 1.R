@@ -37,7 +37,8 @@ wvs <-
     republican = if_else(E179 == 840001, 1, 0),
     democrat = if_else(E179 == 840002, 1, 0),
     independent = if_else(E179 == 840003, 1, 0),
-    otherparty = if_else(vote == 1 & republican == 0 & democrat == 0 & independent == 0 , 1, 0),
+    otherparty = if_else(vote == 1 &
+                           republican == 0 & democrat == 0 & independent == 0 , 1, 0),
     hardwork = replace(A030, A030 < 0, NA),
     thrift = replace(A038, A038 < 0, NA),
     jobpay = replace(C011, C011 < 0, NA),
@@ -64,7 +65,7 @@ wvs <-
     relationship = if_else(X007 %in% c(1, 2, 8), 1, 0),
     relationship = replace(relationship, X007 < 1, NA),
     higheducation = if_else(X025 >= 6, 1, 0),
-    higheducation = replace(higheducation,X007 < 1, NA),
+    higheducation = replace(higheducation, X007 < 1, NA),
     employed = if_else(X028 %in% c(1, 2, 3), 1, 0),
     employed = replace(employed, X028 < 1, NA)
   ) %>%
@@ -90,7 +91,7 @@ wvs <-
     jobholidays,
     jobachieve,
     jobresponsible,
-    jobdoable, 
+    jobdoable,
     risktolerance,
     competitionharm,
     sex,
@@ -105,7 +106,7 @@ View(wvs)
 summary(wvs)
 
 # B) Based on the variable X001, construct averages of all other variables across male and
-  # female respondents (summarize).
+# female respondents (summarize).
 
 SummarybySex <- wvs %>%
   group_by(sex) %>%
@@ -117,35 +118,32 @@ View(SummarybySex)
 # C) Tabulate the averages from B. You could do it in MS Word. Visualize the averages
 # from B using some of the R tools (you need to do your own research for this part).
 
-
-
 library(ggplot2)
 
-
 # General Plot
-dx <- as.matrix(SummarybySex[-c(1,2,4,24, 25,26, 27)])  # Exclude columns 1, 2 and 27
-rownames(dx) <- SummarybySex$sex[-c(1, 2,4,24,25, 26, 27)]
+dx <-
+  as.matrix(SummarybySex[-c(1, 2, 4, 24, 25, 26, 27)])  # Exclude columns 1, 2 and 27
+rownames(dx) <- SummarybySex$sex[-c(1, 2, 4, 24, 25, 26, 27)]
 
 # Define colors
 colours <- c("pink", "blue")
 
-# Create the barplot 
-barplot(dx,
-        main = 'Summary by Sex',
-        ylab = 'Results',
-        beside = TRUE,
-        col = colours,
-        ylim = c(0, max(dx) * 1.3),
-        names.arg = rownames(dx),
-        las = 2)  
+# Create the barplot
+barplot(
+  dx,
+  main = 'Summary by Sex',
+  ylab = 'Results',
+  beside = TRUE,
+  col = colours,
+  ylim = c(0, max(dx) * 1.3),
+  names.arg = rownames(dx),
+  las = 2
+)
 
 # legend("topright", legend = colnames(dx), fill = colours)
 
 # Add a box around the plot
 box()
 
-# others plot
 
 # D) Regress the income variable (inc) on each one of these variables in separate regressions:
-
-
