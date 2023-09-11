@@ -146,12 +146,6 @@ box()
 
 # others plot
 
+# D) Regress the income variable (inc) on each one of these variables in separate regressions:
 
 
-
-# tempdir()
-# dir.create(tempdir())
-# wvs <-
-#   read_sas("C:/Users/nicho/OneDrive/UCF MS - FinTech/FIN 6779/wvs_dataset.sas7bdat")
-# as.data.frame(wvs)
-# unique(wvs$E179)
