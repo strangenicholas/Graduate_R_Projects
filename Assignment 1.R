@@ -146,3 +146,20 @@ box()
 
 
 # D) Regress the income variable (inc) on each one of these variables in separate regressions:
+
+# fit <- lm(wvs$age ~ wvs$inc, data=wvs)
+# summary(fit)
+
+feature_names <- setdiff(names(wvs), c("inc", "sex"))
+model_summaries <- data.frame(Feature = character(), R_squared = numeric())
+
+for (feature in feature_names) {
+  fit <- lm(wvs[[feature]] ~ inc, data = wvs)
+  model_summary <- data.frame(Feature = feature, R_squared = summary(fit)$r.squared)
+  model_summaries <- rbind(model_summaries, model_summary)
+}
+sorted_summaries <- model_summaries[order(-model_summaries$R_squared), ]
+
+top_3_features <- head(sorted_summaries, 3)
+
+top_3_features
