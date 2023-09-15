@@ -147,10 +147,9 @@ box()
 
 # D) Regress the income variable (inc) on each one of these variables in separate regressions:
 
-# fit <- lm(wvs$age ~ wvs$inc, data=wvs)
-# summary(fit)
+# run regression on all features and select top 3 r-squared descending
 
-feature_names <- setdiff(names(wvs), c("inc", "sex"))
+feature_names <- setdiff(names(wvs), c("inc", "sex", "hinc"))
 model_summaries <- data.frame(Feature = character(), R_squared = numeric())
 
 for (feature in feature_names) {
@@ -163,3 +162,9 @@ sorted_summaries <- model_summaries[order(-model_summaries$R_squared), ]
 top_3_features <- head(sorted_summaries, 3)
 
 top_3_features
+
+# combined top 3 features
+top_3_comb <- lm(inc ~ wvs$vote + wvs$year + wvs$relationship, data = wvs)
+
+# print the summary of the regression model
+summary(top_3_comb)$r.squared
