@@ -2,7 +2,6 @@ library(dplyr)
 library(haven)
 
 
-
 ## Read in data
 wvs <-
   read_sas("C:/Users/nicho/OneDrive/UCF MS - FinTech/FIN 6779/wvs_dataset.sas7bdat")
@@ -38,7 +37,8 @@ wvs <-
     democrat = if_else(E179 == 840002, 1, 0),
     independent = if_else(E179 == 840003, 1, 0),
     otherparty = if_else(vote == 1 &
-                           republican == 0 & democrat == 0 & independent == 0 , 1, 0),
+                           republican == 0 &
+                           democrat == 0 & independent == 0 , 1, 0),
     hardwork = replace(A030, A030 < 0, NA),
     thrift = replace(A038, A038 < 0, NA),
     jobpay = replace(C011, C011 < 0, NA),
@@ -140,31 +140,35 @@ barplot(
   las = 2
 )
 
-
-# Add a box around the plot
 box()
 
 
 # D) Regress the income variable (inc) on each one of these variables in separate regressions:
 
-# run regression on all features and select top 3 r-squared descending
+# run regression on all features and 
 
 feature_names <- setdiff(names(wvs), c("inc", "sex", "hinc"))
-model_summaries <- data.frame(Feature = character(), R_squared = numeric())
+model_summaries <-
+  data.frame(Feature = character(), R_squared = numeric())
 
 for (feature in feature_names) {
   fit <- lm(wvs[[feature]] ~ inc, data = wvs)
-  model_summary <- data.frame(Feature = feature, R_squared = summary(fit)$r.squared)
+  model_summary <-
+    data.frame(Feature = feature, R_squared = summary(fit)$r.squared)
   model_summaries <- rbind(model_summaries, model_summary)
 }
-sorted_summaries <- model_summaries[order(-model_summaries$R_squared), ]
+
+# select top 3 r-squared descending
+sorted_summaries <-
+  model_summaries[order(-model_summaries$R_squared),]
 
 top_3_features <- head(sorted_summaries, 3)
 
 top_3_features
 
 # combined top 3 features
-top_3_comb <- lm(inc ~ wvs$vote + wvs$year + wvs$relationship, data = wvs)
+top_3_comb <-
+  lm(inc ~ wvs$vote + wvs$year + wvs$relationship, data = wvs)
 
 # print the summary of the regression model
 summary(top_3_comb)$r.squared
