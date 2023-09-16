@@ -147,7 +147,7 @@ box()
 
 # run regression on all features and 
 
-feature_names <- setdiff(names(wvs), c("inc", "sex", "hinc"))
+feature_names <- setdiff(names(wvs), c("inc", "sex", "hinc", "year"))
 model_summaries <-
   data.frame(Feature = character(), R_squared = numeric())
 
@@ -168,7 +168,7 @@ top_3_features
 
 # combined top 3 features
 top_3_comb <-
-  lm(inc ~ wvs$vote + wvs$year + wvs$relationship, data = wvs)
+  lm(inc ~ wvs$vote + wvs$relationship + wvs$higheducation, data = wvs)
 
 # print the summary of the regression model
 summary(top_3_comb)$r.squared
