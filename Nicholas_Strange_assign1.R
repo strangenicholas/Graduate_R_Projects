@@ -158,6 +158,8 @@ for (feature in feature_names) {
   model_summaries <- rbind(model_summaries, model_summary)
 }
 
+sorted_summaries
+
 # select top 3 r-squared descending
 sorted_summaries <-
   model_summaries[order(-model_summaries$R_squared),]
@@ -172,3 +174,6 @@ top_3_comb <-
 
 # print the summary of the regression model
 summary(top_3_comb)$r.squared
+
+
+
