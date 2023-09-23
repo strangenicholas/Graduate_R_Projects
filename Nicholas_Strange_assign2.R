@@ -5,12 +5,12 @@ library(haven)
 mret <- read_sas("C:/Users/nicho/OneDrive/UCF MS - FinTech/FIN 6779/mret7018.sas7bdat") 
 as.data.frame(mret)
 
-# Calculate EOM price
-mret['Price'] <- abs(mret['PRC'])
-# Adjust price for stock split
-# mret['adjprice'] <- Price/CFACPR
-# Get top 10 
-View(head(mret, 10))
+
+# mret['Price'] <- abs(mret['PRC'])
+# # Adjust price for stock split
+# # mret['adjprice'] <- Price/CFACPR
+# # Get top 10 
+# View(head(mret, 10))
 
 mret <-
   mret %>%
@@ -35,7 +35,7 @@ head(mret1)
 # Calculate return by month
 mret1 <- 
   mret1 %>%
-  mitate(year, )
+  mutate(year, )
 mret1 <- mret %>%
   group_by(month,year) %>%
   summarise(EWRET = mean(RET, na.rm = TRUE),
@@ -45,7 +45,10 @@ mret1 <- mret %>%
             VWRET = weighted.mean(RET, mcap1, na.rm = TRUE))
 head(mret1)
 
+# Find the correlation of your variable with the return variable in the data (RET). Why is the correlation not 1?  
+cor(mret1$EWRET, mret1$EWRETD, use = "complete.obs")
 
+cor(mret1$VWRET, mret1$VWRETD, use= "complete.obs")
 
 # B) Does the stock market perform differently during the month of February in a leap year
 # vs. a common year? 
@@ -70,9 +73,11 @@ leap_years
 leap_years = unique(leap_years$year)
 leap_years
 
-
-mret3 <-
-  mret1 %>% filter(year  %in% (leap_years))
+mret3 <- mret1 %>%
+  filter(year  %in% (leap_years)) %>%
+  group_by(month) %>%
+  summarise(EWRETD=100*mean(EWRETD, na.rm = TRUE),
+            VWRETD=100*mean(VWRETD, na.rm = TRUE))
 
 mret3m = as.matrix(mret3)
 barplot(mret3m[,2], names.arg=mret3m[,1],
@@ -81,6 +86,3 @@ barplot(mret3m[,2], names.arg=mret3m[,1],
 
 
 
-
-# B) Does the stock market perform differently during the month of February in a leap year
-# vs. a common year? 
