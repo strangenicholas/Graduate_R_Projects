@@ -5,13 +5,11 @@ library(haven)
 mret <- read_sas("C:/Users/nicho/OneDrive/UCF MS - FinTech/FIN 6779/mret7018.sas7bdat") 
 as.data.frame(mret)
 
+# A) As noted above, the dataset mret7018 provides monthly stock price data over the 1970–
+# 2018 (see the file mret_var for definitions). Using the price variable (find it), construct
+# monthly stock returns for each stock each month based on the formula:
 
-# mret['Price'] <- abs(mret['PRC'])
-# # Adjust price for stock split
-# # mret['adjprice'] <- Price/CFACPR
-# # Get top 10 
-# View(head(mret, 10))
-
+# Calculate real price
 mret <-
   mret %>%
   group_by(PERMNO) %>%
@@ -20,28 +18,27 @@ mret <-
          PRC = abs(PRC),
          AdjPRC = PRC/CFACPR,
          mcap = PRC*SHROUT,
-         mcap1 = lag(mcap, 1))
+         mcap1 = lag(mcap, 1)
+         )
 
 mret <- filter(mret, mcap1 != 'NA')
 mret1 <- mret %>%
-  arrange(month)
-head(mret1)
+  arrange(DATE)
+# head(mret1)
 
-# A) As noted above, the dataset mret7018 provides monthly stock price data over the 1970–
-# 2018 (see the file mret_var for definitions). Using the price variable (find it), construct
-# monthly stock returns for each stock each month based on the formula:
+View(mret1)
+
 
 
 # Calculate return by month
-mret1 <- 
-  mret1 %>%
-  mutate(year, )
 mret1 <- mret %>%
-  group_by(month,year) %>%
+  group_by(PERMNO, year, month) %>%
   summarise(EWRET = mean(RET, na.rm = TRUE),
             NRET=sum(!is.na(RET)),
             EWRETD = mean(EWRETD, na.rm = TRUE),
             VWRETD = mean(VWRETD, na.rm = TRUE),
+            PRC0 = lag(AdjPRC,1),
+            FinPrice = ((AdjPRC - PRC0)/ PRC0),
             VWRET = weighted.mean(RET, mcap1, na.rm = TRUE))
 head(mret1)
 
