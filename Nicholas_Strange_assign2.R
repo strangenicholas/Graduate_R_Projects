@@ -5,9 +5,14 @@ library(haven)
 mret <- read_sas("C:/Users/nicho/OneDrive/UCF MS - FinTech/FIN 6779/mret7018.sas7bdat") 
 as.data.frame(mret)
 
+mret <- filter(mret, SHRCD %in% c(10,11)) 
+
+mret <- unique(mret)
+
 # A) As noted above, the dataset mret7018 provides monthly stock price data over the 1970–
 # 2018 (see the file mret_var for definitions). Using the price variable (find it), construct
 # monthly stock returns for each stock each month based on the formula:
+
 
 # Calculate real price and portfolio returns
 mret <-
@@ -20,7 +25,9 @@ mret <-
          mcap = PRC*SHROUT,
          mcap1 = lag(mcap, 1),
          PRC0 = lag(AdjPRC,1),
-         FRET = ((AdjPRC - PRC0 + DIVAMT)/ PRC0)
+         DIV = ifelse(is.na(DIVAMT), 0, DIVAMT),
+         FRETD = ((AdjPRC - PRC0 + DIV)/ PRC0),
+         FRET = ((AdjPRC - PRC0)/ PRC0)
          )
 
 mret <- filter(mret, mcap1 != 'NA')
@@ -28,37 +35,28 @@ mret <- mret %>%
   arrange(DATE)
 # head(mret)
 
-View(mret)
-
-mret1 <- mret %>%
-  group_by(DATE) %>%
-  summarise(EWRET = mean(FRET, na.rm = TRUE), 
-            NRET=sum(!is.na(FRET)), 
-            EWRETD = mean(EWRETD, na.rm = TRUE), 
-            VWRETD = mean(VWRETD, na.rm = TRUE),
-            VWRET = weighted.mean(FRET, mcap1, na.rm = TRUE),
-            ) 
-
-
-
 # Find the correlation of your variable with the return variable in the data (RET). Why is the correlation not 1?  
-cor(mret1$EWRET,mret1$EWRETD, use="pairwise.complete.obs") 
-cor(mret1$VWRET,mret1$VWRETD, use="pairwise.complete.obs") 
+cor(mret$FRET,mret$RET, use="pairwise.complete.obs")
+cor(mret$FRETD,mret$RET, use="pairwise.complete.obs") 
+
+
+# cor(mret1$EWRET,mret1$EWRETD, use="pairwise.complete.obs") 
+# cor(mret1$VWRET,mret1$VWRETD, use="pairwise.complete.obs")
 
 # B) Does the stock market perform differently during the month of February in a leap year
 # vs. a common year? 
-mret1 <- 
-  mret1 %>% 
+mret <- 
+  mret %>% 
   mutate(year = as.numeric(format(DATE,"%Y")), 
          month = as.numeric(format(DATE,"%m"))) 
 
-mret2 <- mret1 %>%
+mret1 <- mret %>%
   group_by(month) %>%
   summarise(EWRETD=100*mean(EWRETD, na.rm = TRUE),
             VWRETD=100*mean(VWRETD, na.rm = TRUE))
 
-mret2m = as.matrix(mret2)
-barplot(mret2m[,2], names.arg=mret2m[,1],
+mret1m = as.matrix(mret1)
+barplot(mret1m[,2], names.arg=mret1m[,1],
         xlab="Month", ylab="Market Return", col="blue",
         main="Stock Market Seasonality", border="red")
 
@@ -72,7 +70,7 @@ leap_years
 leap_years = unique(leap_years$year)
 leap_years
 
-mret3 <- mret1 %>%
+mret3 <- mret %>%
   filter(year  %in% (leap_years)) %>%
   group_by(month) %>%
   summarise(EWRETD=100*mean(EWRETD, na.rm = TRUE),
