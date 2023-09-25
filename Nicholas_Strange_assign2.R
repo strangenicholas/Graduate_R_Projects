@@ -7,7 +7,7 @@ as.data.frame(mret)
 
 mret <- filter(mret, SHRCD %in% c(10,11)) 
 
-mret <- unique(mret)
+mret %>% distinct()
 
 # A) As noted above, the dataset mret7018 provides monthly stock price data over the 1970–
 # 2018 (see the file mret_var for definitions). Using the price variable (find it), construct
