@@ -9,7 +9,7 @@ as.data.frame(mret)
 # 2018 (see the file mret_var for definitions). Using the price variable (find it), construct
 # monthly stock returns for each stock each month based on the formula:
 
-# Calculate real price
+# Calculate real price and portfolio returns
 mret <-
   mret %>%
   group_by(PERMNO) %>%
@@ -18,38 +18,39 @@ mret <-
          PRC = abs(PRC),
          AdjPRC = PRC/CFACPR,
          mcap = PRC*SHROUT,
-         mcap1 = lag(mcap, 1)
+         mcap1 = lag(mcap, 1),
+         PRC0 = lag(AdjPRC,1),
+         FRET = ((AdjPRC - PRC0 + DIVAMT)/ PRC0)
          )
 
 mret <- filter(mret, mcap1 != 'NA')
-mret1 <- mret %>%
+mret <- mret %>%
   arrange(DATE)
-# head(mret1)
+# head(mret)
 
-View(mret1)
+View(mret)
+
+mret1 <- mret %>%
+  group_by(DATE) %>%
+  summarise(EWRET = mean(FRET, na.rm = TRUE), 
+            NRET=sum(!is.na(FRET)), 
+            EWRETD = mean(EWRETD, na.rm = TRUE), 
+            VWRETD = mean(VWRETD, na.rm = TRUE),
+            VWRET = weighted.mean(FRET, mcap1, na.rm = TRUE),
+            ) 
 
 
-# Calculate return by month
-mret2 <- mret1 %>%
-  group_by(PERMNO, year, month) %>%
-  mutate(PRC0 = lag(AdjPRC,1),
-         FRET = ((AdjPRC - PRC0)/ PRC0),)
-  summarise(
-    EWRET = mean(mret1$RET, na.rm = TRUE),
-    NRET=sum(!is.na(mret1$RET)),
-    EWRETD = mean(mret1$EWRETD, na.rm = TRUE),
-    VWRETD = mean(mret1$VWRETD, na.rm = TRUE),
-    VWRET = weighted.mean(mret1$RET, mret1$mcap1, na.rm = TRUE))
-
-head(mret2)
 
 # Find the correlation of your variable with the return variable in the data (RET). Why is the correlation not 1?  
-cor(mret1$FRET, mret1$EWRETD, use = "complete.obs")
-
-cor(mret1$FRET, mret1$VWRETD, use= "complete.obs")
+cor(mret1$EWRET,mret1$EWRETD, use="pairwise.complete.obs") 
+cor(mret1$VWRET,mret1$VWRETD, use="pairwise.complete.obs") 
 
 # B) Does the stock market perform differently during the month of February in a leap year
 # vs. a common year? 
+mret1 <- 
+  mret1 %>% 
+  mutate(year = as.numeric(format(DATE,"%Y")), 
+         month = as.numeric(format(DATE,"%m"))) 
 
 mret2 <- mret1 %>%
   group_by(month) %>%
