@@ -29,23 +29,24 @@ mret1 <- mret %>%
 View(mret1)
 
 
-
 # Calculate return by month
-mret1 <- mret %>%
+mret2 <- mret1 %>%
   group_by(PERMNO, year, month) %>%
-  summarise(EWRET = mean(RET, na.rm = TRUE),
-            NRET=sum(!is.na(RET)),
-            EWRETD = mean(EWRETD, na.rm = TRUE),
-            VWRETD = mean(VWRETD, na.rm = TRUE),
-            PRC0 = lag(AdjPRC,1),
-            FinPrice = ((AdjPRC - PRC0)/ PRC0),
-            VWRET = weighted.mean(RET, mcap1, na.rm = TRUE))
-head(mret1)
+  mutate(PRC0 = lag(AdjPRC,1),
+         FRET = ((AdjPRC - PRC0)/ PRC0),)
+  summarise(
+    EWRET = mean(mret1$RET, na.rm = TRUE),
+    NRET=sum(!is.na(mret1$RET)),
+    EWRETD = mean(mret1$EWRETD, na.rm = TRUE),
+    VWRETD = mean(mret1$VWRETD, na.rm = TRUE),
+    VWRET = weighted.mean(mret1$RET, mret1$mcap1, na.rm = TRUE))
+
+head(mret2)
 
 # Find the correlation of your variable with the return variable in the data (RET). Why is the correlation not 1?  
-cor(mret1$EWRET, mret1$EWRETD, use = "complete.obs")
+cor(mret1$FRET, mret1$EWRETD, use = "complete.obs")
 
-cor(mret1$VWRET, mret1$VWRETD, use= "complete.obs")
+cor(mret1$FRET, mret1$VWRETD, use= "complete.obs")
 
 # B) Does the stock market perform differently during the month of February in a leap year
 # vs. a common year? 
