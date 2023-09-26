@@ -22,18 +22,19 @@ mret <-
          month = as.numeric(format(DATE,"%m")),
          PRC = abs(PRC),
          AdjPRC = PRC/CFACPR,
-         mcap = PRC*SHROUT,
-         mcap1 = lag(mcap, 1),
          PRC0 = lag(AdjPRC,1),
          DIV = ifelse(is.na(DIVAMT), 0, DIVAMT),
          FRETD = ((AdjPRC - PRC0 + DIV)/ PRC0),
-         FRET = ((AdjPRC - PRC0)/ PRC0)
+         FRET = ((AdjPRC - PRC0)/ PRC0),
+         mcap = PRC*SHROUT,
+         mcap1 = lag(mcap, 1)
          )
 
 mret <- filter(mret, mcap1 != 'NA')
 mret <- mret %>%
   arrange(DATE)
 # head(mret)
+View(mret)
 
 # Find the correlation of your variable with the return variable in the data (RET). Why is the correlation not 1?  
 cor(mret$FRET,mret$RET, use="pairwise.complete.obs")
@@ -80,6 +81,8 @@ mret3m = as.matrix(mret3)
 barplot(mret3m[,2], names.arg=mret3m[,1],
         xlab="Month", ylab="Market Return", col="blue",
         main="Stock Market Seasonality", border="red")
+
+
 
 
 
