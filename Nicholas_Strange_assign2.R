@@ -7,6 +7,7 @@ as.data.frame(mret)
 
 mret <- filter(mret, SHRCD %in% c(10,11)) 
 
+# Remove duplicate records
 mret %>% distinct()
 
 # A) As noted above, the dataset mret7018 provides monthly stock price data over the 1970–
@@ -20,29 +21,28 @@ mret <-
   group_by(PERMNO) %>%
   mutate(year = as.numeric(format(DATE,"%Y")),
          month = as.numeric(format(DATE,"%m")),
+         # Get absolute value of PRC
          PRC = abs(PRC),
+         # Adjust PRC for splits, spinoffs, and dividends
          AdjPRC = PRC/CFACPR,
+         # Get PRC of previous month
          PRC0 = lag(AdjPRC,1),
-         DIV = ifelse(is.na(DIVAMT), 0, DIVAMT),
-         FRETD = ((AdjPRC - PRC0 + DIV)/ PRC0),
+         # Calculate return 
          FRET = ((AdjPRC - PRC0)/ PRC0),
          mcap = PRC*SHROUT,
          mcap1 = lag(mcap, 1)
          )
 
+# Only include rows where market cap of the previous month is not NA
 mret <- filter(mret, mcap1 != 'NA')
 mret <- mret %>%
   arrange(DATE)
-# head(mret)
+
 View(mret)
 
 # Find the correlation of your variable with the return variable in the data (RET). Why is the correlation not 1?  
 cor(mret$FRET,mret$RET, use="pairwise.complete.obs")
-cor(mret$FRETD,mret$RET, use="pairwise.complete.obs") 
 
-
-# cor(mret1$EWRET,mret1$EWRETD, use="pairwise.complete.obs") 
-# cor(mret1$VWRET,mret1$VWRETD, use="pairwise.complete.obs")
 
 # B) Does the stock market perform differently during the month of February in a leap year
 # vs. a common year? 
@@ -59,7 +59,7 @@ mret1 <- mret %>%
 mret1m = as.matrix(mret1)
 barplot(mret1m[,2], names.arg=mret1m[,1],
         xlab="Month", ylab="Market Return", col="blue",
-        main="Stock Market Seasonality", border="red")
+        main="Stock Market Seasonality All Years", border="red")
 
 
 # get leap years
@@ -80,7 +80,7 @@ mret3 <- mret %>%
 mret3m = as.matrix(mret3)
 barplot(mret3m[,2], names.arg=mret3m[,1],
         xlab="Month", ylab="Market Return", col="blue",
-        main="Stock Market Seasonality", border="red")
+        main="Stock Market Seasonality Leap Years", border="red")
 
 
 
