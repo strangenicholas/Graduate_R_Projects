@@ -24,13 +24,13 @@ mret <-
          mcap = PRC*SHROUT,
          mcap1 = lag(mcap, 1)
   ) %>%
-select(DATE, PERMNO, COMNAM, mcap1, VWRET)
+select(DATE, PERMNO, COMNAM, mcap1, VWRETD)
 # deduplicate
 mret %>% distinct()
 
 mret %>% filter(mret,mcap1 != 'NA')
 
-head(mret)
+View(mret)
 
 # Get top 1 by mcap1 by month
 mret1 <-
@@ -50,6 +50,21 @@ port1 <-
   mret%>%
   group_by(DATE) %>%
   slice_max(order_by = mcap1, n = 10) %>%
-  summarize(VWRET = mean((VWRET, na.rm = TRUE)))
 
-View(port1)
+port1
+
+port1_ret<-
+  port1%>%
+  group_by(DATE) %>%
+  summarize(VWRETD = mean(VWRETD, na.rm = TRUE))
+
+port1_ret
+#mkt return
+mret2 <-
+  mret%>%
+  group_by(DATE) %>%
+  summarize(VWRETD = mean(VWRETD, na.rm = TRUE))
+
+mret2
+# get coorelation
+cor(port1_ret$VWRETD,mret2$VWRETD, use="pairwise.complete.obs")
