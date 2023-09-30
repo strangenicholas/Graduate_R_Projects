@@ -24,7 +24,14 @@ mret <-
          mcap = PRC*SHROUT,
          mcap1 = lag(mcap, 1)
   ) %>%
-select(DATE, PERMNO, COMNAM, mcap1)
+select(DATE, PERMNO, COMNAM, mcap1, VWRET)
+# deduplicate
+mret %>% distinct()
+
+mret %>% filter(mret,mcap1 != 'NA')
+
+head(mret)
+
 # Get top 1 by mcap1 by month
 mret1 <-
   mret%>%
@@ -41,5 +48,8 @@ print(top_mcap_sorted)
 
 port1 <-
   mret%>%
-  group_by(year,month) %>%
-  slice_max(order_by = mcap1, n = 10)
+  group_by(DATE) %>%
+  slice_max(order_by = mcap1, n = 10) %>%
+  summarize(VWRET = mean((VWRET, na.rm = TRUE)))
+
+View(port1)
