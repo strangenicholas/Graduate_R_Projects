@@ -28,6 +28,7 @@ mret <-
     mcap1 = lag(mcap, 1)
   ) %>%
   select(DATE, PERMNO, COMNAM, mcap1, RET, VWRETD)
+
 # deduplicate
 mret %>% distinct()
 
@@ -118,6 +119,6 @@ barplot(
   main = "Correlations with VWRETD by Portfolio Number",
   xlab = "Portfolio Number",
   ylab = "Correlation Coefficient",
-  col = "skyblue",
+  col = "blue",
   border = "black",
 )
