@@ -72,7 +72,6 @@ for (n in n_values) {
     group_by(DATE) %>%
     slice_max(order_by = mcap1, n = n) %>%
     summarise(ARET = mean(RET, na.rm = TRUE))
-  
   # Store results
   portfolios[[paste0("port", n)]] <- port
 }
