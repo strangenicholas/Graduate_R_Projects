@@ -32,7 +32,6 @@ mret <-
 # deduplicate
 mret %>% distinct()
 
-# mret %>% filter(mret, mcap1 != 'NA')
 
 # View(mret)
 
@@ -47,6 +46,8 @@ head(mret1)
 top_mcap <- table(mret1$PERMNO)
 top_mcap_sorted <- sort(top_mcap, decreasing = TRUE)
 print(top_mcap_sorted)
+
+
 
 # B) Construct the monthly returns of 10 value-weighted dynamic portfolios consisting of the (10, 20, ...,100) stocks with the largest market capitalization as of the end of the previous month. Calculate the correlations of the returns of these portfolios with the returns of the value-weighted market index (VWRETD) over the 1970 –2018 period. Visualize the 10 correlation coefficients (e.g., via histogram). Interpret the results.
 
