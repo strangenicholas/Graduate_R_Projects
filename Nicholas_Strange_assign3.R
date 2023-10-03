@@ -29,9 +29,6 @@ mret <-
   ) %>%
   select(DATE, PERMNO, COMNAM, mcap1, RET, VWRETD)
 
-# deduplicate
-mret %>% distinct()
-
 
 # View(mret)
 
@@ -57,9 +54,7 @@ mret2 <-
   mret %>%
   group_by(DATE) %>%
   summarize(VWRETD = mean(VWRETD, na.rm = TRUE))
-
-mret2
-
+# mret2
 
 # Store Portfolio Results
 portfolios <- list()
