@@ -19,6 +19,7 @@
 library(dplyr)
 library(haven)
 library(ggplot2)
+library(PerformanceAnalytics)
 
 ## Read in data
 dret <-
@@ -36,6 +37,16 @@ dret <-
     PRC = abs(PRC)
   )
 dret
+
+#Set allocations
+allocations <- data.frame(
+  Stock = c("IBML", "MSFTL", "MSFTS", "GMS", "Cash"),
+  Position = c(1.212, 3.444, 1.872, .568, 5.380)
+)
+
+allocations$allocation <- allocations$Position / sum(allocations$Position)
+
+allocations
 
 
 #Extract the stocks
@@ -84,11 +95,68 @@ stocks
 stockprices = filter(stocks, DATE == "2018-10-12")
 stockprices
 
-mv <- ((1.212 * stockprices$ibmp) + (3.444 * stockprices$msftp) - (1.872 * stockprices$msftp) + (0.568 * stockprices$gmp) +(5.380))
+mv <- ((1.212 * stockprices$IBMP) + (3.444 * stockprices$MSFTP) - (1.872 * stockprices$MSFTP) - (0.568 * stockprices$GMP) +(5.380))
 
 mv
 
+ibma <- allocations$allocation[allocations$Stock == "IBML"] / sum(allocations$Position)
+msfta <- (allocations$allocation[allocations$Stock == "MSFTL"] - allocations$allocation[allocations$Stock == "MSFTS"]) / sum(allocations$Position)
+gma <- allocations$allocation[allocations$Stock == "GMS"] / sum(allocations$Position)
+
 #Construct the trading book historical returns
 stocks <- stocks %>%
-  mutate(PRET = 0.85 * IBMR + 0.14 * RM,
+  mutate(PRET = ibma * IBMR + msfta * MSFTR + gma * GMR,
          Percentile = ntile(PRET, 100)) 
+
+## ESTIMATE MEAN AND STD 
+MSTD <- stocks %>% 
+  summarise(MRET = mean(PRET, na.rm = TRUE), 
+            SDRET=sd(PRET, na.rm = TRUE), 
+            NRET=sum(!is.na(PRET))) 
+MSTD 
+
+MSTD <- MSTD %>% 
+  mutate(Norm=qnorm(0.01, mean=MRET, sd=SDRET, lower.tail=TRUE))
+MSTD
+
+## HSM: Estimate 1-ile 
+stocksP <- stocks %>% 
+  arrange(PRET) %>% 
+  mutate(count = row_number()) %>% 
+  select(DATE, PRET, Percentile, count)
+stocksP
+
+## VaR: Normal Distribution 
+VAR1 <- -123.9*(VaR(stocks$PRET, p=.99, method="gaussian"))
+
+print(VAR1)
+
+## VaR: Non-parametric  
+VAR2 <- -123.9*(VaR(stocks$PRET, p=.99, method="historical"))
+
+print(VAR2)
+
+## VaR: Nodified  
+VAR3 <- -123.9*(VaR(stocks$PRET, p=.99, method="modified"))
+
+print(VAR3) 
+
+
+##################################################
+
+# #Simulate stock returns  
+# stocks <- stocks %>% 
+#   mutate(RP = Rf + 2.8*(RM-Rf) + rnorm(998,0,0.02),
+#          PRET1=0.85*IBMR+0.14*RP, Percentile=ntile(PRET1,100)) 
+# 
+# View(stocks) 
+# 
+# 
+# ## VaR: Normal Distribution 
+# VAR4 <- -123.9*(VaR(stocks$PRET1, p=.99, method="gaussian"))
+# print(VAR4) 
+# 
+# ## VaR: Non-parametric  
+# VAR5 <- -123.9*(VaR(stocks$PRET1, p=.99, method="historical"))
+# print(VAR5)
+
