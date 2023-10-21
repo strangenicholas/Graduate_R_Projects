@@ -65,8 +65,8 @@ gm  <- gm %>% transmute(
   month = month,
   day = day,
   DATE = DATE,
-  IBMR = RET,
-  IBMP = PRC
+  GMR = RET,
+  GMP = PRC
 )
 
 
@@ -84,10 +84,8 @@ stocks
 stockprices = filter(stocks, DATE == "2018-10-12")
 stockprices
 
-mv <-
-  ((1.212 * stockprices$ibmp) + (3.444 * stockprices$msftp) - (1.872 * stockprices$msftp) + (0.568 * stockprices$gmp) +
-     (5.380)
-  )
+mv <- ((1.212 * stockprices$ibmp) + (3.444 * stockprices$msftp) - (1.872 * stockprices$msftp) + (0.568 * stockprices$gmp) +(5.380))
+
 mv
 
 #Construct the trading book historical returns
