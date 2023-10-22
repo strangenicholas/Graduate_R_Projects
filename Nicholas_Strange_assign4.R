@@ -38,16 +38,6 @@ dret <-
   )
 dret
 
-#Set allocations
-allocations <- data.frame(
-  Stock = c("IBML", "MSFTL", "MSFTS", "GMS", "Cash"),
-  Position = c(1.212, 3.444, 1.872, .568, 5.380)
-)
-
-allocations$allocation <- allocations$Position / sum(allocations$Position)
-
-allocations
-
 
 #Extract the stocks
 ibm <- filter(dret, PERMNO == '12490')
@@ -95,29 +85,66 @@ stocks
 stockprices = filter(stocks, DATE == "2018-10-12")
 stockprices
 
-mv <- ((1.212 * stockprices$IBMP) + (3.444 * stockprices$MSFTP) - (1.872 * stockprices$MSFTP) - (0.568 * stockprices$GMP) +(5.380))
+# Set positions and market value
 
+mv <- data.frame(
+  Stock = c("IBML", "MSFTL", "MSFTS", "GMS", "Cash"),
+  Position = c(1.212, 3.444, -1.872, -.568, 5.380),
+  Price = c(stockprices$IBMP, stockprices$MSFTP, stockprices$MSFTP, stockprices$GMP, 1)
+)
+
+mv$MarketValue <- mv$Position * mv$Price
+mv$allocation <- mv$MarketValue / sum(mv$MarketValue)
+
+# Questions: What is the total value of Fuzzy Logic’s portfolio and the weights of each asset
 mv
+sum(mv$MarketValue)
 
-ibma <- allocations$allocation[allocations$Stock == "IBML"] / sum(allocations$Position)
-msfta <- (allocations$allocation[allocations$Stock == "MSFTL"] - allocations$allocation[allocations$Stock == "MSFTS"]) / sum(allocations$Position)
-gma <- allocations$allocation[allocations$Stock == "GMS"] / sum(allocations$Position)
+# Get allocation by stock
+ibma <- mv$allocation[allocations$Stock == "IBML"] / sum(mv$MarketValue)
+msfta <- (mv$allocation[allocations$Stock == "MSFTL"] - mv$allocation[allocations$Stock == "MSFTS"]) / sum(mv$MarketValue)
+gma <- mv$allocation[allocations$Stock == "GMS"] / sum(mv$MarketValue)
+casha <- mv$allocation[allocations$Stock == "Cash"] / sum(mv$MarketValue)
+
+
+##########################################
+
+# Calculate the VaR of the porfoilo at the 5% level over the next trading day based on the
+
+PRET <- (ibma * ibm$IBMR + msfta * msft$MSFTR + gma * gm$GMR + cash)
+
+# 1) Variance Covariance Method (pp.8–9) and
+
+stocks <- stocks %>%
+  mutate(PRET = ibma * ibm$IBMR + msfta * msft$MSFTR + gma * gm$GMR + casha)
+# 2) Historical Simulation Method (p. 10).
+
+
+
+
+
+
+
+
+
+
+
 
 #Construct the trading book historical returns
 stocks <- stocks %>%
   mutate(PRET = ibma * IBMR + msfta * MSFTR + gma * GMR,
          Percentile = ntile(PRET, 100)) 
 
-## ESTIMATE MEAN AND STD 
-MSTD <- stocks %>% 
-  summarise(MRET = mean(PRET, na.rm = TRUE), 
-            SDRET=sd(PRET, na.rm = TRUE), 
-            NRET=sum(!is.na(PRET))) 
-MSTD 
-
-MSTD <- MSTD %>% 
-  mutate(Norm=qnorm(0.01, mean=MRET, sd=SDRET, lower.tail=TRUE))
-MSTD
+# ## ESTIMATE MEAN AND STD 
+# MSTD <- stocks %>% 
+#   summarise(MRET = mean(PRET, na.rm = TRUE), 
+#             SDRET=sd(PRET, na.rm = TRUE), 
+#             NRET=sum(!is.na(PRET))) 
+# MSTD 
+# 
+# MSTD <- MSTD %>% 
+#   mutate(Norm=qnorm(0.01, mean=MRET, sd=SDRET, lower.tail=TRUE))
+# MSTD
 
 ## HSM: Estimate 1-ile 
 stocksP <- stocks %>% 
@@ -127,36 +154,21 @@ stocksP <- stocks %>%
 stocksP
 
 ## VaR: Normal Distribution 
-VAR1 <- -123.9*(VaR(stocks$PRET, p=.99, method="gaussian"))
+VAR1 <- -123.9*(VaR(stocks$PRET, p=.95, method="gaussian"))
 
 print(VAR1)
 
 ## VaR: Non-parametric  
-VAR2 <- -123.9*(VaR(stocks$PRET, p=.99, method="historical"))
+VAR2 <- -123.9*(VaR(stocks$PRET, p=.95, method="historical"))
 
 print(VAR2)
 
 ## VaR: Nodified  
-VAR3 <- -123.9*(VaR(stocks$PRET, p=.99, method="modified"))
+VAR3 <- -123.9*(VaR(stocks$PRET, p=.95, method="modified"))
 
 print(VAR3) 
 
 
 ##################################################
 
-# #Simulate stock returns  
-# stocks <- stocks %>% 
-#   mutate(RP = Rf + 2.8*(RM-Rf) + rnorm(998,0,0.02),
-#          PRET1=0.85*IBMR+0.14*RP, Percentile=ntile(PRET1,100)) 
-# 
-# View(stocks) 
-# 
-# 
-# ## VaR: Normal Distribution 
-# VAR4 <- -123.9*(VaR(stocks$PRET1, p=.99, method="gaussian"))
-# print(VAR4) 
-# 
-# ## VaR: Non-parametric  
-# VAR5 <- -123.9*(VaR(stocks$PRET1, p=.99, method="historical"))
-# print(VAR5)
 
