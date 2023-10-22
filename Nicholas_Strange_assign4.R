@@ -112,13 +112,11 @@ ibma + msfta + gma + casha
 
 # Calculate the VaR of the porfoilo at the 5% level over the next trading day based on the
 
-# 1) Variance Covariance Method (pp.8–9) and
-
-print(ibma * IBMR + msfta * MSFTR + gma * GMR)
-
 stocks <- stocks %>%
-  mutate(PRET = ibma * IBMR + msfta * MSFTR + gma * GMR)
+  mutate(PRET = ibma * IBMR + msfta * MSFTR + gma * GMR, 
+         Percentile=ntile(PRET,100))
 
+# 1) Variance Covariance Method (pp.8–9) and
 
 ## ESTIMATE MEAN AND STD
 MSTD <- stocks %>%
@@ -136,56 +134,18 @@ print(paste("VaR =",VaR1, "Million"))
 
 # 2) Historical Simulation Method (p. 10).
 
-
-
-
-
-
-
-
-
-
-
-
-#Construct the trading book historical returns
-stocks <- stocks %>%
-  mutate(PRET = ibma * IBMR + msfta * MSFTR + gma * GMR,
-         Percentile = ntile(PRET, 100)) 
-
-# ## ESTIMATE MEAN AND STD 
-# MSTD <- stocks %>% 
-#   summarise(MRET = mean(PRET, na.rm = TRUE), 
-#             SDRET=sd(PRET, na.rm = TRUE), 
-#             NRET=sum(!is.na(PRET))) 
-# MSTD 
-# 
-# MSTD <- MSTD %>% 
-#   mutate(Norm=qnorm(0.01, mean=MRET, sd=SDRET, lower.tail=TRUE))
-# MSTD
-
-## HSM: Estimate 1-ile 
+## HSM: Estimate 5 percentile
 stocksP <- stocks %>% 
   arrange(PRET) %>% 
   mutate(count = row_number()) %>% 
   select(DATE, PRET, Percentile, count)
 stocksP
 
-## VaR: Normal Distribution 
-VAR1 <- -123.9*(VaR(stocks$PRET, p=.95, method="gaussian"))
+pt <- stocksP$PRET[stocksP$count == "50"]
 
-print(VAR1)
-
-## VaR: Non-parametric  
-VAR2 <- -123.9*(VaR(stocks$PRET, p=.95, method="historical"))
-
-print(VAR2)
-
-## VaR: Nodified  
-VAR3 <- -123.9*(VaR(stocks$PRET, p=.95, method="modified"))
-
-print(VAR3) 
+VaR2 <- round(abs(pt * sum(mv$MarketValue)),2)
+print(paste("VaR =",VaR2, "Million"))
 
 
-##################################################
 
 
