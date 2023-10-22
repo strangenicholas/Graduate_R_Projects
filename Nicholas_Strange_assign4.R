@@ -101,22 +101,39 @@ mv
 sum(mv$MarketValue)
 
 # Get allocation by stock
-ibma <- mv$allocation[allocations$Stock == "IBML"] / sum(mv$MarketValue)
-msfta <- (mv$allocation[allocations$Stock == "MSFTL"] - mv$allocation[allocations$Stock == "MSFTS"]) / sum(mv$MarketValue)
-gma <- mv$allocation[allocations$Stock == "GMS"] / sum(mv$MarketValue)
-casha <- mv$allocation[allocations$Stock == "Cash"] / sum(mv$MarketValue)
+ibma <- mv$allocation[mv$Stock == "IBML"] 
+msfta <- (mv$allocation[mv$Stock == "MSFTL"] + mv$allocation[mv$Stock == "MSFTS"]) 
+gma <- mv$allocation[mv$Stock == "GMS"] 
+casha <- mv$allocation[mv$Stock == "Cash"] 
 
+ibma + msfta + gma + casha
 
 ##########################################
 
 # Calculate the VaR of the porfoilo at the 5% level over the next trading day based on the
 
-PRET <- (ibma * ibm$IBMR + msfta * msft$MSFTR + gma * gm$GMR + cash)
-
 # 1) Variance Covariance Method (pp.8–9) and
 
+print(ibma * IBMR + msfta * MSFTR + gma * GMR)
+
 stocks <- stocks %>%
-  mutate(PRET = ibma * ibm$IBMR + msfta * msft$MSFTR + gma * gm$GMR + casha)
+  mutate(PRET = ibma * IBMR + msfta * MSFTR + gma * GMR)
+
+
+## ESTIMATE MEAN AND STD
+MSTD <- stocks %>%
+  summarise(MRET = mean(PRET, na.rm = TRUE),
+            SDRET=sd(PRET, na.rm = TRUE),
+            NRET=sum(!is.na(PRET)))
+MSTD
+
+MSTD <- MSTD %>%
+  mutate(Norm=qnorm(0.05, mean=MRET, sd=SDRET, lower.tail=TRUE))
+MSTD
+
+VaR1 <- round(abs(MSTD$Norm * sum(mv$MarketValue)),2)
+print(paste("VaR =",VaR1, "Million"))
+
 # 2) Historical Simulation Method (p. 10).
 
 
