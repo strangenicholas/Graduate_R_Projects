@@ -12,7 +12,7 @@
 
 # Questions: What is the total value of Fuzzy Logic’s portfolio and the weights of each asset
 # in the portfolio at the end of the trading day?
-# Calculate the VaR of the porfoilo at the 5% level over the next trading day based on the
+# Calculate the VaR of the portfolio at the 5% level over the next trading day based on the
 # 1) Variance Covariance Method (pp.8–9) and
 # 2) Historical Simulation Method (p. 10).
 
@@ -110,7 +110,7 @@ ibma + msfta + gma + casha
 
 ##########################################
 
-# Calculate the VaR of the porfoilo at the 5% level over the next trading day based on the
+# Calculate the VaR of the portfolio at the 5% level over the next trading day based on the
 
 stocks <- stocks %>%
   mutate(PRET = ibma * IBMR + msfta * MSFTR + gma * GMR, 
@@ -130,7 +130,7 @@ MSTD <- MSTD %>%
 MSTD
 
 VaR1 <- round(abs(MSTD$Norm * sum(mv$MarketValue)),2)
-print(paste("VaR =",VaR1, "Million"))
+print(paste("VaR1 =",VaR1, "Million"))
 
 # 2) Historical Simulation Method (p. 10).
 
@@ -141,10 +141,10 @@ stocksP <- stocks %>%
   select(DATE, PRET, Percentile, count)
 stocksP
 
-pt <- stocksP$PRET[stocksP$count == "50"]
+pt <- stocksP$PRET[stocksP$count == "50"] # Get 5 percentile
 
 VaR2 <- round(abs(pt * sum(mv$MarketValue)),2)
-print(paste("VaR =",VaR2, "Million"))
+print(paste("VaR2 =",VaR2, "Million"))
 
 
 
