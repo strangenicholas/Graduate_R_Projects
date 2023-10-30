@@ -67,9 +67,13 @@ colnames(mret)
 fit <- lm(CRASH ~ ., data = mret)
 summary(fit) # show results
 
-## Non-linear regression    
-fit <- lm(CRASH ~ PRC + sz + mcap + r1m + r2m + r3m + r4m + r5m + v1m + v2m + v3m + v4m + v5m, data=mret)
+## Non-linear regression
+fit <-
+  lm(
+    CRASH ~ PRC + sz + mcap + r1m + r2m + r3m + r4m + r5m + r6m + v1m + v2m + v3m + v4m + v5m + v6m + mcap1m + mcap2m + mcap3m + mcap4m + mcap5m + mcap6m,
+    data = mret
+  )
 summary(fit) # show results 
 
-fit1 <- lm(CRASH ~ mcap + v1m + v2m + v3m + v4m + v5m, data=mret)
+fit1 <- lm(CRASH ~ mcap + v1m + v2m + v3m + v4m + v5m + v6m, data=mret)
 summary(fit1) # show results 
