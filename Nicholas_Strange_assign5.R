@@ -36,27 +36,40 @@ mret <-
          PRC = abs(PRC), 
          sz = PRC*SHROUT, 
          mcap = lag(sz, 1),
-         pr1m = lag(RET,1), #Past return 1 month
-         pr2m = lag(RET,2), #Past return 2 month
-         pr3m = lag(RET,3), #Past return 3 month
-         pr4m = lag(RET,4), #Past return 4 month
-         pr5m = lag(RET,5), #Past return 5 month
-         v1m = abs(pr1m), #Volatility 1 month prior
-         v2m = abs(pr2m), #Volatility 2 month prior
-         v3m = abs(pr3m), #Volatility 3 month prior
-         v4m = abs(pr4m), #Volatility 4 month prior
-         v5m = abs(pr5m), #Volatility 5 month prior
+         r1m = lag(RET,1), #Past return 1 month
+         r2m = lag(RET,2), #Past return 2 month
+         r3m = lag(RET,3), #Past return 3 month
+         r4m = lag(RET,4), #Past return 4 month
+         r5m = lag(RET,5), #Past return 5 month
+         r6m = lag(RET,6), #Past return 6 month
+         v1m = abs(r1m), #Volatility 1 month prior
+         v2m = abs(r2m), #Volatility 2 month prior
+         v3m = abs(r3m), #Volatility 3 month prior
+         v4m = abs(r4m), #Volatility 4 month prior
+         v5m = abs(r5m), #Volatility 5 month prior
+         v6m = abs(r6m), #Volatility 6 month prior
+         mcap1m = lag(sz, 2), #mcap 1 month prior
+         mcap2m = lag(sz, 3), #mcap 1 month prior
+         mcap3m = lag(sz, 4), #mcap 1 month prior
+         mcap4m = lag(sz, 5), #mcap 1 month prior
+         mcap5m = lag(sz, 6), #mcap 1 month prior
+         mcap6m = lag(sz, 7), #mcap 1 month prior
          CRASH = if_else(RET <= -.08, 1,0))%>% 
   ungroup 
 
 mret <- filter(mret, mcap != 'NA') 
 mret <- filter(mret, year >= (max(year)-5))
 
-View(mret)
-
+# View(mret)
+# 
 colnames(mret)
 
+fit <- lm(CRASH ~ ., data = mret)
+summary(fit) # show results
 
 ## Non-linear regression    
-fit <- lm(CRASH ~ PRC, sz, mcap, pr1m, pr2m, pr3m, pr4m, pr5m, v1m, v2m, v3m, v4m, v5m, data=mret)
+fit <- lm(CRASH ~ PRC + sz + mcap + r1m + r2m + r3m + r4m + r5m + v1m + v2m + v3m + v4m + v5m, data=mret)
 summary(fit) # show results 
+
+fit1 <- lm(CRASH ~ mcap + v1m + v2m + v3m + v4m + v5m, data=mret)
+summary(fit1) # show results 
