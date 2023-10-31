@@ -25,6 +25,7 @@ as.data.frame(mret)
 
 mret <- filter(mret, SHRCD %in% c(10, 11))
 
+
 # Remove duplicate records
 mret %>% distinct()
 
@@ -49,31 +50,29 @@ mret <-
          v5m = abs(r5m), #Volatility 5 month prior
          v6m = abs(r6m), #Volatility 6 month prior
          mcap1m = lag(sz, 2), #mcap 1 month prior
-         mcap2m = lag(sz, 3), #mcap 1 month prior
-         mcap3m = lag(sz, 4), #mcap 1 month prior
-         mcap4m = lag(sz, 5), #mcap 1 month prior
-         mcap5m = lag(sz, 6), #mcap 1 month prior
-         mcap6m = lag(sz, 7), #mcap 1 month prior
+         mcap2m = lag(sz, 3), #mcap 2 month prior
+         mcap3m = lag(sz, 4), #mcap 3 month prior
+         mcap4m = lag(sz, 5), #mcap 4 month prior
+         mcap5m = lag(sz, 6), #mcap 5 month prior
+         mcap6m = lag(sz, 7), #mcap 6 month prior
+         turn = (VOL/SHROUT),
          CRASH = if_else(RET <= -.08, 1,0))%>% 
   ungroup 
 
 mret <- filter(mret, mcap != 'NA') 
 mret <- filter(mret, year >= (max(year)-5))
 
-# View(mret)
-# 
+View(mret)
+# Coorelation
 colnames(mret)
-
-fit <- lm(CRASH ~ ., data = mret)
-summary(fit) # show results
 
 ## Non-linear regression
 fit <-
   lm(
-    CRASH ~ PRC + sz + mcap + r1m + r2m + r3m + r4m + r5m + r6m + v1m + v2m + v3m + v4m + v5m + v6m + mcap1m + mcap2m + mcap3m + mcap4m + mcap5m + mcap6m,
+    CRASH ~ r1m + r2m + r3m + r4m + r5m + r6m + v1m + v2m + v3m + v4m + v5m + v6m + mcap1m + mcap2m + mcap3m + mcap4m + mcap5m + mcap6m + turn,
     data = mret
   )
 summary(fit) # show results 
 
-fit1 <- lm(CRASH ~ mcap + v1m + v2m + v3m + v4m + v5m + v6m, data=mret)
+fit1 <- lm(CRASH ~ v1m + v2m + v3m + v4m + v5m + v6m + turn, data=mret)
 summary(fit1) # show results 
