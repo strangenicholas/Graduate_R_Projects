@@ -63,7 +63,13 @@ mret <-
          turn5m = lag(turn, 5), # turn 5 month prior
          turn6m = lag(turn, 6), # turn 6 month prior
          CRASH = if_else(RET <= -.08, 1,0))%>% 
-  ungroup 
+  ungroup %>% 
+  select(PERMNO, year, month, mcap, 
+         r1m, r2m, r3m, r4m, r5m, r6m, 
+         v1m, v2m, v3m, v4m, v5m, v6m, 
+         mcap1m, mcap2m, mcap3m, mcap4m, mcap5m, mcap6m,
+         turn1m, turn2m, turn3m, turn4m, turn5m, turn6m,
+         CRASH)
 
 mret <- filter(mret, mcap != 'NA') 
 mret <- filter(mret, year >= (max(year)-5))
