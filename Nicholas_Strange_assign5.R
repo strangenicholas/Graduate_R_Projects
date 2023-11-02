@@ -56,6 +56,12 @@ mret <-
          mcap5m = lag(sz, 6), #mcap 5 month prior
          mcap6m = lag(sz, 7), #mcap 6 month prior
          turn = (VOL/SHROUT),
+         turn1m = lag(turn, 1), # turn 1 month prior
+         turn2m = lag(turn, 2), # turn 2 month prior
+         turn3m = lag(turn, 3), # turn 3 month prior
+         turn4m = lag(turn, 4), # turn 4 month prior
+         turn5m = lag(turn, 5), # turn 5 month prior
+         turn6m = lag(turn, 6), # turn 6 month prior
          CRASH = if_else(RET <= -.08, 1,0))%>% 
   ungroup 
 
@@ -69,10 +75,42 @@ colnames(mret)
 ## Non-linear regression
 fit <-
   lm(
-    CRASH ~ r1m + r2m + r3m + r4m + r5m + r6m + v1m + v2m + v3m + v4m + v5m + v6m + mcap1m + mcap2m + mcap3m + mcap4m + mcap5m + mcap6m + turn,
+    CRASH ~ r1m + r2m + r3m + r4m + r5m + r6m + v1m 
+    + v2m + v3m + v4m + v5m + v6m + mcap1m + mcap2m 
+    + mcap3m + mcap4m + mcap5m + mcap6m + turn1m + turn2m
+    + turn3m + turn4m + turn5m + turn6m,
     data = mret
   )
 summary(fit) # show results 
 
-fit1 <- lm(CRASH ~ v1m + v2m + v3m + v4m + v5m + v6m + turn, data=mret)
+fit1 <- lm(CRASH ~  v1m + v2m + v3m 
+           + v4m + v5m + v6m,
+           data=mret)
 summary(fit1) # show results 
+
+
+####### Logistic regression   
+fit <- glm(CRASH ~ v1m + v2m + v3m 
+           + v4m + v5m + v6m, 
+           family = "binomial", data=mret)
+summary(fit)  
+
+####### Decision tree  
+library(rpart)
+library(rpart.plot)
+
+fit <- lm(CRASH ~ v1m + v2m + v3m 
+          + v4m + v5m + v6m, data=mret)
+summary(fit) # show results 
+
+dt <- rpart(CRASH ~ v1m + v2m + v3m 
+            + v4m + v5m + v6m, data=mret)
+summary(dt) 
+# Plot the decision tree 
+prp(dt, space=4, split.cex=1.5, nn.border.col=0)
+
+
+####### Random forest 
+rf <- randomForest(CRASH ~ v1m + v2m + v3m 
+                   + v4m + v5m + v6m, data=mret)
+summary(rf)
