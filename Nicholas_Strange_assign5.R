@@ -116,6 +116,11 @@ summary(dt)
 # Plot the decision tree 
 prp(dt, space=4, split.cex=1.5, nn.border.col=0)
 
+####### Random forest 
+rf <- randomForest(CRASH ~ v1m + v2m + v3m 
+                   + v4m + v5m + v6m, data=mret)
+summary(rf)
+
 
 ####### CARET: Predicting Crashes
 mret2 <- 
@@ -128,9 +133,6 @@ mret2 <-
          CRASH) %>% 
   mutate(CRASH = as.factor(CRASH))
 summary(mret2) 
-
-# Identify variables with limited variation 
-nearZeroVar(mret2, freqCut = 70/30, uniqueCut = 10)
 
 ### Random number generation  
 set.seed(2)
