@@ -71,6 +71,7 @@ mret <-
          turn1m, turn2m, turn3m, turn4m, turn5m, turn6m,
          CRASH)
 
+mret <- na.omit(mret)
 mret <- filter(mret, mcap != 'NA') 
 mret <- filter(mret, year >= (max(year)-5))
 
@@ -116,7 +117,80 @@ summary(dt)
 prp(dt, space=4, split.cex=1.5, nn.border.col=0)
 
 
-####### Random forest 
-rf <- randomForest(CRASH ~ v1m + v2m + v3m 
-                   + v4m + v5m + v6m, data=mret)
-summary(rf)
+####### CARET: Predicting Crashes
+mret2 <- 
+  mret %>% 
+  select(PERMNO, year, month, mcap, 
+         r1m, r2m, r3m, r4m, r5m, r6m, 
+         v1m, v2m, v3m, v4m, v5m, v6m, 
+         mcap1m, mcap2m, mcap3m, mcap4m, mcap5m, mcap6m,
+         turn1m, turn2m, turn3m, turn4m, turn5m, turn6m,
+         CRASH) %>% 
+  mutate(CRASH = as.factor(CRASH))
+summary(mret2) 
+
+# Identify variables with limited variation 
+nearZeroVar(mret2, freqCut = 70/30, uniqueCut = 10)
+
+### Random number generation  
+set.seed(2)
+rnorm(5)
+rnorm(5) 
+
+set.seed(2)
+rnorm(5)
+
+
+### Data splitting 
+set.seed(123)
+
+inTrain <- createDataPartition(mret2$CRASH, p = .70, list = FALSE)
+inTrain[1:10]
+
+Train <- mret2[ inTrain,]
+Test  <- mret2[-inTrain,]
+summary(Train)
+summary(Test)
+
+### Train a model 
+glm <- train(CRASH ~ v1m + v2m + v3m 
+             + v4m + v5m + v6m, 
+             family=binomial(link='logit'), 
+             method = "glm", data=Train)
+glm 
+
+# Obtaining details about each model 
+getModelInfo("glm") 
+
+varimpGLM = varImp(glm)
+varimpGLM
+plot(varimpGLM, main = "Mret Variable Importance: GLM") 
+
+### Comparing models: GLM vs. Neural network 
+nn <- train(CRASH ~ v1m + v2m + v3m 
+            + v4m + v5m + v6m, 
+            method = "nnet", data=Train)
+nn
+
+fitProbNN <- predict(nn, Test, type = "prob") 
+head(fitProbNN)
+
+fitProbNN1 <- fitProbNN$"1"
+
+par(pty = "s") 
+roc(Test$CRASH, fitProbNN1, plot=TRUE, legacy.axes=TRUE, col="#377eb8", 
+    print.auc=TRUE)
+
+
+## ROC: GLM & NN 
+par(pty = "s") 
+roc(Test$CRASH, fitProb1, plot=TRUE, legacy.axes=TRUE, col="#377eb8", 
+    print.auc=TRUE)
+
+roc(Test$CRASH, fitProbNN1, plot=TRUE, legacy.axes=TRUE,  col="#4daf4a", 
+    add=TRUE, print.auc=TRUE, print.auc.y=0.4)
+
+legend("bottomright", legend=c("GLM Model", 
+                               "NN Model"), 
+       col=c("#377eb8", "#4daf4a"), lwd=3)
+
