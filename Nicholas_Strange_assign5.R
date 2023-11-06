@@ -113,7 +113,7 @@ summary(dt)
 # Plot the decision tree 
 prp(dt, space=4, split.cex=1.5, nn.border.col=0)
 
-####### Random forest  cant use because target variable should have more than 5 unique values
+####### Random forest  --cant use because target variable should have more than 5 unique values
 # rf <- randomForest(CRASH ~ v1m + v2m + v3m 
 #                    + v4m + v5m + v6m, data=mret)
 # summary(rf)
@@ -131,6 +131,7 @@ mret2 <-
          CRASH) %>% 
   mutate(CRASH = as.factor(CRASH))
 summary(mret2) 
+
 
 ### Random number generation
 set.seed(2)
@@ -177,6 +178,189 @@ par(pty = "s")
 roc(Test$CRASH, fitProb1, plot=TRUE, legacy.axes=TRUE, col="#377eb8", 
     print.auc=TRUE)
 
+# Explore different thresholds with CARET      
+fitProbT80 <- factor(ifelse(fitProb1 >= 0.8, 1, 0))
+
+confusionMatrix(reference = Test$CRASH, data = fitProbT80, 
+                mode = "everything",
+                positive = "1") 
+# Explore different thresholds with CARET      
+fitProbT80 <- factor(ifelse(fitProb1 >= 0.8, 1, 0))
+
+confusionMatrix(reference = Test$CRASH, data = fitProbT80, 
+                mode = "everything",
+                positive = "1") 
+
+# Explore different thresholds with pROC 
+par(pty = "s") 
+roc.out <- roc(Test$CRASH, fitProb1, plot=TRUE)
+summary(roc.out) 
+
+roc.df <- data.frame(
+  Sensitivity=roc.out$sensitivities,
+  Specificity=roc.out$specificities, 
+  fpp=1-roc.out$specificities, 
+  Threshold=roc.out$thresholds) 
+
+roc.dfT <- roc.df %>% 
+  filter(Threshold > 0.79 & Threshold < 0.81)
+roc.dfT 
+
+
+### Choosing an optimal threshold 
+# Extracting Accuracy form the CM 
+Accuracy <- function(t){
+  fitProbT <- factor(ifelse(fitProb1 >= t, 1, 0))
+  cm <- caret::confusionMatrix(reference = Test$CRASH, 
+                               data = fitProbT, 
+                               mode = "everything",
+                               positive = "1") 
+  a <- c(cm$overall[['Accuracy']]) 
+  return(a)
+}
+
+T=0
+acc=Accuracy(0.001) 
+
+for(i in seq(1,9)){
+  if(acc < Accuracy(i/10)){
+    T=i/10  
+    acc=Accuracy(i/10)} 
+} 
+
+Tacc <- c(T,acc)
+Tacc
+
+### Once you choose a threshold, you can classify new observations 
+# Simulate new observations 
+mret2
+
+mret2new <- mret2 %>% 
+  select(v2m, v3m, v4m, v5m, v6m
+        , r2m, r4m, r5m, r6m) %>% 
+  sample_frac(0.003)
+mret2new 
+
+# Classify the observations @ T=0.4 
+fitProbNew <- predict(glm, mret2new, type = "prob")
+
+fitProbNew <- fitProbNew  %>% 
+  mutate(CRASH = if_else(fitProbNew$"1">0.4,1,0))
+fitProbNew 
+
+
+
+# CARET finds optimal thresholds  
+fit <- predict(glm, Test)
+fit[1:10]
+
+confusionMatrix(reference = Test$CRASH, data = fit, 
+                mode = "everything",
+                positive = "1") 
+
+
+
+### Comparing models: GLM vs. Random forest 
+rf <- train(CRASH ~ v2m + v3m + v4m + v5m + v6m
+            + r2m + r4m + r5m + r6m, 
+            method = "rf", data=Train)
+rf
+
+fitProbRF <- predict(rf, Test, type = "prob")
+head(fitProbRF)
+
+fitProbRF1 <- fitProbRF$"1"
+
+par(pty = "s") 
+roc(Test$hinc, fitProbRF1, plot=TRUE, legacy.axes=TRUE, col="#377eb8", 
+    print.auc=TRUE)
+
+# Look up the parameters that are optimized 
+modelLookup("rf")
+
+
+## ROC: GLM & RF 
+par(pty = "s") 
+roc(Test$CRASH, fitProb1, plot=TRUE, legacy.axes=TRUE, col="#377eb8", 
+    print.auc=TRUE)
+
+roc(Test$CRASH, fitProbRF1, plot=TRUE, legacy.axes=TRUE,  col="#4daf4a", 
+    add=TRUE, print.auc=TRUE, print.auc.y=0.4)
+
+legend("bottomright", legend=c("GLM Model", 
+                               "RF Model"), 
+       col=c("#377eb8", "#4daf4a"), lwd=3)
+
+
+
+### Comparing models: GLM vs. Neural network 
+nn <- train(CRASH ~ v2m + v3m + v4m + v5m + v6m
+            + r2m + r4m + r5m + r6m, 
+            method = "nnet", data=Train)
+nn
+
+fitProbNN <- predict(nn, Test, type = "prob") 
+head(fitProbNN)
+
+fitProbNN1 <- fitProbNN$"1"
+
+par(pty = "s") 
+roc(Test$CRASH, fitProbNN1, plot=TRUE, legacy.axes=TRUE, col="#377eb8", 
+    print.auc=TRUE)
+
+# Look up the parameters that are optimized 
+
+
+## ROC: GLM & NN 
+par(pty = "s") 
+roc(Test$CRASH, fitProb1, plot=TRUE, legacy.axes=TRUE, col="#377eb8", 
+    print.auc=TRUE)
+
+roc(Test$CRASH, fitProbNN1, plot=TRUE, legacy.axes=TRUE,  col="#4daf4a", 
+    add=TRUE, print.auc=TRUE, print.auc.y=0.4)
+
+legend("bottomright", legend=c("GLM Model", 
+                               "NN Model"), 
+       col=c("#377eb8", "#4daf4a"), lwd=3)
+
+
+
+
+
+
+### Comparing models: GLM vs. GLM2 
+
+glm <- train(CRASH ~ v2m + v3m + v4m + v5m + v6m
+             + r2m + r4m + r5m + r6m, 
+             method = "glm", data=Train)
+glm
+
+varimpGLM = varImp(glm)
+varimpGLM
+plot(varimpGLM, main = "MRET Variable Importance: GLM") 
+
+
+# Drop unimportant variables 
+glm2 <- train(CRASH ~ v2m + v4m + v5m + v6m
+              + r2m, 
+              method = "glm", data=Train)
+glm2
+
+fitProb2 <- predict(glm2, Test, type = "prob")
+fitProb21 <- fitProb2$"1"
+
+
+## ROC: GLM & GLM2 
+par(pty = "s") 
+roc(Test$CRASH, fitProb1, plot=TRUE, legacy.axes=TRUE, col="#377eb8", 
+    print.auc=TRUE)
+
+roc(Test$CRASH, fitProb21, plot=TRUE, legacy.axes=TRUE,  col="#4daf4a", 
+    add=TRUE, print.auc=TRUE, print.auc.y=0.4)
+
+legend("bottomright", legend=c("GLM Model", 
+                               "NL GLM Model"), 
+       col=c("#377eb8", "#4daf4a"), lwd=3)
 
 
 ### Comparing models
@@ -184,5 +368,5 @@ roc(Test$CRASH, fitProb1, plot=TRUE, legacy.axes=TRUE, col="#377eb8",
 summary(fitNLR)$r.squared
 summary(fitLgR)$r.squared
 
-summary(fitProb1)
+
 
