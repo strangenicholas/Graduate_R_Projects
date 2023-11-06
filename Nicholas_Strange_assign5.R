@@ -63,8 +63,8 @@ mret <-
          turn5m = lag(turn, 5), # turn 5 month prior
          turn6m = lag(turn, 6), # turn 6 month prior
          CRASH = if_else(RET <= -.08, 1,0))%>% 
-  ungroup %>% 
-  select(PERMNO, year, month, mcap, 
+         ungroup %>% 
+         select(PERMNO, year, month, mcap, 
          r1m, r2m, r3m, r4m, r5m, r6m, 
          v1m, v2m, v3m, v4m, v5m, v6m, 
          mcap1m, mcap2m, mcap3m, mcap4m, mcap5m, mcap6m,
@@ -75,9 +75,6 @@ mret <- na.omit(mret)
 mret <- filter(mret, mcap != 'NA') 
 mret <- filter(mret, year >= (max(year)-5))
 
-View(mret)
-# Coorelation
-colnames(mret)
 
 ## Non-linear regression
 fit <-
@@ -90,36 +87,37 @@ fit <-
   )
 summary(fit) # show results 
 
-fit1 <- lm(CRASH ~  v1m + v2m + v3m 
-           + v4m + v5m + v6m,
-           data=mret)
-summary(fit1) # show results 
+fitNLR <- lm(CRASH ~  v2m + v3m + v4m + v5m + v6m
+             + r2m + r4m + r5m + r6m,
+             data = mret)
+summary(fitNLR) # show results 
 
 
 ####### Logistic regression   
-fit <- glm(CRASH ~ v1m + v2m + v3m 
-           + v4m + v5m + v6m, 
+fitLgR <- glm(CRASH ~ v2m + v3m + v4m + v5m + v6m
+              + r2m + r4m + r5m + r6m, 
            family = "binomial", data=mret)
-summary(fit)  
+summary(fitLgR)  
 
 ####### Decision tree  
 library(rpart)
 library(rpart.plot)
 
-fit <- lm(CRASH ~ v1m + v2m + v3m 
-          + v4m + v5m + v6m, data=mret)
-summary(fit) # show results 
+fit3 <- lm(CRASH ~ v2m + v3m + v4m + v5m + v6m
+           + r2m + r4m + r5m + r6m, data=mret)
+summary(fit3) # show results 
 
-dt <- rpart(CRASH ~ v1m + v2m + v3m 
-            + v4m + v5m + v6m, data=mret)
+dt <- rpart(CRASH ~ v2m + v3m + v4m + v5m + v6m
+            + r2m + r4m + r5m + r6m, data=mret)
 summary(dt) 
 # Plot the decision tree 
 prp(dt, space=4, split.cex=1.5, nn.border.col=0)
 
-####### Random forest 
-rf <- randomForest(CRASH ~ v1m + v2m + v3m 
-                   + v4m + v5m + v6m, data=mret)
-summary(rf)
+####### Random forest  cant use because target variable should have more than 5 unique values
+# rf <- randomForest(CRASH ~ v1m + v2m + v3m 
+#                    + v4m + v5m + v6m, data=mret)
+# summary(rf)
+
 
 
 ####### CARET: Predicting Crashes
@@ -134,10 +132,10 @@ mret2 <-
   mutate(CRASH = as.factor(CRASH))
 summary(mret2) 
 
-### Random number generation  
+### Random number generation
 set.seed(2)
 rnorm(5)
-rnorm(5) 
+rnorm(5)
 
 set.seed(2)
 rnorm(5)
@@ -155,8 +153,8 @@ summary(Train)
 summary(Test)
 
 ### Train a model 
-glm <- train(CRASH ~ v1m + v2m + v3m 
-             + v4m + v5m + v6m, 
+glm <- train(CRASH ~ v2m + v3m + v4m + v5m + v6m
+             + r2m + r4m + r5m + r6m, 
              family=binomial(link='logit'), 
              method = "glm", data=Train)
 glm 
@@ -168,31 +166,23 @@ varimpGLM = varImp(glm)
 varimpGLM
 plot(varimpGLM, main = "Mret Variable Importance: GLM") 
 
-### Comparing models: GLM vs. Neural network 
-nn <- train(CRASH ~ v1m + v2m + v3m 
-            + v4m + v5m + v6m, 
-            method = "nnet", data=Train)
-nn
+### Creating ROC curves 
+# Output the probabilities for 1   
+fitProb <- predict(glm, Test, type = "prob")
+head(fitProb)
 
-fitProbNN <- predict(nn, Test, type = "prob") 
-head(fitProbNN)
-
-fitProbNN1 <- fitProbNN$"1"
-
+fitProb1 <- fitProb$"1"
 par(pty = "s") 
-roc(Test$CRASH, fitProbNN1, plot=TRUE, legacy.axes=TRUE, col="#377eb8", 
-    print.auc=TRUE)
 
-
-## ROC: GLM & NN 
-par(pty = "s") 
 roc(Test$CRASH, fitProb1, plot=TRUE, legacy.axes=TRUE, col="#377eb8", 
     print.auc=TRUE)
 
-roc(Test$CRASH, fitProbNN1, plot=TRUE, legacy.axes=TRUE,  col="#4daf4a", 
-    add=TRUE, print.auc=TRUE, print.auc.y=0.4)
 
-legend("bottomright", legend=c("GLM Model", 
-                               "NN Model"), 
-       col=c("#377eb8", "#4daf4a"), lwd=3)
+
+### Comparing models
+
+summary(fitNLR)$r.squared
+summary(fitLgR)$r.squared
+
+summary(fitProb1)
 
