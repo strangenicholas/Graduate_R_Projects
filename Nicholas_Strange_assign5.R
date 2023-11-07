@@ -258,38 +258,42 @@ confusionMatrix(reference = Test$CRASH, data = fit,
                 mode = "everything",
                 positive = "1") 
 
+### Comparing models: Non-linear regression vs. Logistic regression
+
+summary(fitNLR)$r.squared
+summary(fitLgR)$r.squared
 
 
-### Comparing models: GLM vs. Random forest 
-rf <- train(CRASH ~ v2m + v3m + v4m + v5m + v6m
-            + r2m + r4m + r5m + r6m, 
-            method = "rf", data=Train)
-rf
-
-fitProbRF <- predict(rf, Test, type = "prob")
-head(fitProbRF)
-
-fitProbRF1 <- fitProbRF$"1"
-
-par(pty = "s") 
-roc(Test$hinc, fitProbRF1, plot=TRUE, legacy.axes=TRUE, col="#377eb8", 
-    print.auc=TRUE)
-
-# Look up the parameters that are optimized 
-modelLookup("rf")
-
-
-## ROC: GLM & RF 
-par(pty = "s") 
-roc(Test$CRASH, fitProb1, plot=TRUE, legacy.axes=TRUE, col="#377eb8", 
-    print.auc=TRUE)
-
-roc(Test$CRASH, fitProbRF1, plot=TRUE, legacy.axes=TRUE,  col="#4daf4a", 
-    add=TRUE, print.auc=TRUE, print.auc.y=0.4)
-
-legend("bottomright", legend=c("GLM Model", 
-                               "RF Model"), 
-       col=c("#377eb8", "#4daf4a"), lwd=3)
+# ### Comparing models: GLM vs. Random forest 
+# rf <- train(CRASH ~ v2m + v3m + v4m + v5m + v6m
+#             + r2m + r4m + r5m + r6m, 
+#             method = "rf", data=Train)
+# rf
+# 
+# fitProbRF <- predict(rf, Test, type = "prob")
+# head(fitProbRF)
+# 
+# fitProbRF1 <- fitProbRF$"1"
+# 
+# par(pty = "s") 
+# roc(Test$hinc, fitProbRF1, plot=TRUE, legacy.axes=TRUE, col="#377eb8", 
+#     print.auc=TRUE)
+# 
+# # Look up the parameters that are optimized 
+# modelLookup("rf")
+# 
+# 
+# ## ROC: GLM & RF 
+# par(pty = "s") 
+# roc(Test$CRASH, fitProb1, plot=TRUE, legacy.axes=TRUE, col="#377eb8", 
+#     print.auc=TRUE)
+# 
+# roc(Test$CRASH, fitProbRF1, plot=TRUE, legacy.axes=TRUE,  col="#4daf4a", 
+#     add=TRUE, print.auc=TRUE, print.auc.y=0.4)
+# 
+# legend("bottomright", legend=c("GLM Model", 
+#                                "RF Model"), 
+       # col=c("#377eb8", "#4daf4a"), lwd=3)
 
 
 
@@ -308,8 +312,6 @@ par(pty = "s")
 roc(Test$CRASH, fitProbNN1, plot=TRUE, legacy.axes=TRUE, col="#377eb8", 
     print.auc=TRUE)
 
-# Look up the parameters that are optimized 
-
 
 ## ROC: GLM & NN 
 par(pty = "s") 
@@ -322,8 +324,6 @@ roc(Test$CRASH, fitProbNN1, plot=TRUE, legacy.axes=TRUE,  col="#4daf4a",
 legend("bottomright", legend=c("GLM Model", 
                                "NN Model"), 
        col=c("#377eb8", "#4daf4a"), lwd=3)
-
-
 
 
 
@@ -363,10 +363,7 @@ legend("bottomright", legend=c("GLM Model",
        col=c("#377eb8", "#4daf4a"), lwd=3)
 
 
-### Comparing models
 
-summary(fitNLR)$r.squared
-summary(fitLgR)$r.squared
 
 
 
