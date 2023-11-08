@@ -264,85 +264,85 @@ summary(fitNLR)$r.squared
 summary(fitLgR)$r.squared
 
 
-# ### Comparing models: GLM vs. Random forest 
-# rf <- train(CRASH ~ v2m + v3m + v4m + v5m + v6m
+### Comparing models: GLM vs. Random forest
+rf <- train(CRASH ~ v2m + v3m + v4m + v5m + v6m
+            + r2m + r4m + r5m + r6m,
+            method = "rf", data=Train, ntree = 100)
+rf
+
+fitProbRF <- predict(rf, Test, type = "prob")
+head(fitProbRF)
+
+fitProbRF1 <- fitProbRF$"1"
+
+par(pty = "s")
+roc(Test$CRASH, fitProbRF1, plot=TRUE, legacy.axes=TRUE, col="#377eb8",
+    print.auc=TRUE)
+
+# Look up the parameters that are optimized
+modelLookup("rf")
+
+
+## ROC: GLM & RF
+par(pty = "s")
+roc(Test$CRASH, fitProb1, plot=TRUE, legacy.axes=TRUE, col="#377eb8",
+    print.auc=TRUE)
+
+roc(Test$CRASH, fitProbRF1, plot=TRUE, legacy.axes=TRUE,  col="#4daf4a",
+    add=TRUE, print.auc=TRUE, print.auc.y=0.4)
+
+legend("bottomright", legend=c("GLM Model",
+                               "RF Model"),
+col=c("#377eb8", "#4daf4a"), lwd=3)
+
+
+
+# ### Comparing models: GLM vs. Neural network 
+# nn <- train(CRASH ~ v2m + v3m + v4m + v5m + v6m
 #             + r2m + r4m + r5m + r6m, 
-#             method = "rf", data=Train)
-# rf
+#             method = "nnet", data=Train)
+# nn
 # 
-# fitProbRF <- predict(rf, Test, type = "prob")
-# head(fitProbRF)
+# fitProbNN <- predict(nn, Test, type = "prob") 
+# head(fitProbNN)
 # 
-# fitProbRF1 <- fitProbRF$"1"
+# fitProbNN1 <- fitProbNN$"1"
 # 
 # par(pty = "s") 
-# roc(Test$hinc, fitProbRF1, plot=TRUE, legacy.axes=TRUE, col="#377eb8", 
+# roc(Test$CRASH, fitProbNN1, plot=TRUE, legacy.axes=TRUE, col="#377eb8", 
 #     print.auc=TRUE)
 # 
-# # Look up the parameters that are optimized 
-# modelLookup("rf")
 # 
-# 
-# ## ROC: GLM & RF 
+# ## ROC: GLM & NN 
 # par(pty = "s") 
 # roc(Test$CRASH, fitProb1, plot=TRUE, legacy.axes=TRUE, col="#377eb8", 
 #     print.auc=TRUE)
 # 
-# roc(Test$CRASH, fitProbRF1, plot=TRUE, legacy.axes=TRUE,  col="#4daf4a", 
+# roc(Test$CRASH, fitProbNN1, plot=TRUE, legacy.axes=TRUE,  col="#4daf4a", 
 #     add=TRUE, print.auc=TRUE, print.auc.y=0.4)
 # 
 # legend("bottomright", legend=c("GLM Model", 
-#                                "RF Model"), 
-       # col=c("#377eb8", "#4daf4a"), lwd=3)
-
-
-
-### Comparing models: GLM vs. Neural network 
-nn <- train(CRASH ~ v2m + v3m + v4m + v5m + v6m
-            + r2m + r4m + r5m + r6m, 
-            method = "nnet", data=Train)
-nn
-
-fitProbNN <- predict(nn, Test, type = "prob") 
-head(fitProbNN)
-
-fitProbNN1 <- fitProbNN$"1"
-
-par(pty = "s") 
-roc(Test$CRASH, fitProbNN1, plot=TRUE, legacy.axes=TRUE, col="#377eb8", 
-    print.auc=TRUE)
-
-
-## ROC: GLM & NN 
-par(pty = "s") 
-roc(Test$CRASH, fitProb1, plot=TRUE, legacy.axes=TRUE, col="#377eb8", 
-    print.auc=TRUE)
-
-roc(Test$CRASH, fitProbNN1, plot=TRUE, legacy.axes=TRUE,  col="#4daf4a", 
-    add=TRUE, print.auc=TRUE, print.auc.y=0.4)
-
-legend("bottomright", legend=c("GLM Model", 
-                               "NN Model"), 
-       col=c("#377eb8", "#4daf4a"), lwd=3)
+#                                "NN Model"), 
+#        col=c("#377eb8", "#4daf4a"), lwd=3)
 
 
 
 
-### Comparing models: GLM vs. GLM2 
+### Comparing models: GLM vs. GLM2
 
 glm <- train(CRASH ~ v2m + v3m + v4m + v5m + v6m
-             + r2m + r4m + r5m + r6m, 
+             + r2m + r4m + r5m + r6m,
              method = "glm", data=Train)
 glm
 
 varimpGLM = varImp(glm)
 varimpGLM
-plot(varimpGLM, main = "MRET Variable Importance: GLM") 
+plot(varimpGLM, main = "MRET Variable Importance: GLM")
 
 
-# Drop unimportant variables 
+# Drop unimportant variables
 glm2 <- train(CRASH ~ v2m + v4m + v5m + v6m
-              + r2m, 
+              + r2m,
               method = "glm", data=Train)
 glm2
 
@@ -350,17 +350,18 @@ fitProb2 <- predict(glm2, Test, type = "prob")
 fitProb21 <- fitProb2$"1"
 
 
-## ROC: GLM & GLM2 
-par(pty = "s") 
-roc(Test$CRASH, fitProb1, plot=TRUE, legacy.axes=TRUE, col="#377eb8", 
+## ROC: GLM & GLM2
+par(pty = "s")
+roc(Test$CRASH, fitProb1, plot=TRUE, legacy.axes=TRUE, col="#377eb8",
     print.auc=TRUE)
 
-roc(Test$CRASH, fitProb21, plot=TRUE, legacy.axes=TRUE,  col="#4daf4a", 
+roc(Test$CRASH, fitProb21, plot=TRUE, legacy.axes=TRUE,  col="#4daf4a",
     add=TRUE, print.auc=TRUE, print.auc.y=0.4)
 
-legend("bottomright", legend=c("GLM Model", 
-                               "NL GLM Model"), 
+legend("bottomright", legend=c("GLM Model",
+                               "NL GLM Model"),
        col=c("#377eb8", "#4daf4a"), lwd=3)
+
 
 
 
