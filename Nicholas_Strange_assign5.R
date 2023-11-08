@@ -113,11 +113,6 @@ summary(dt)
 # Plot the decision tree 
 prp(dt, space=4, split.cex=1.5, nn.border.col=0)
 
-####### Random forest  --cant use because target variable should have more than 5 unique values
-# rf <- randomForest(CRASH ~ v1m + v2m + v3m 
-#                    + v4m + v5m + v6m, data=mret)
-# summary(rf)
-
 
 
 ####### CARET: Predicting Crashes
@@ -279,9 +274,6 @@ par(pty = "s")
 roc(Test$CRASH, fitProbRF1, plot=TRUE, legacy.axes=TRUE, col="#377eb8",
     print.auc=TRUE)
 
-# Look up the parameters that are optimized
-modelLookup("rf")
-
 
 ## ROC: GLM & RF
 par(pty = "s")
@@ -294,37 +286,6 @@ roc(Test$CRASH, fitProbRF1, plot=TRUE, legacy.axes=TRUE,  col="#4daf4a",
 legend("bottomright", legend=c("GLM Model",
                                "RF Model"),
 col=c("#377eb8", "#4daf4a"), lwd=3)
-
-
-
-# ### Comparing models: GLM vs. Neural network 
-# nn <- train(CRASH ~ v2m + v3m + v4m + v5m + v6m
-#             + r2m + r4m + r5m + r6m, 
-#             method = "nnet", data=Train)
-# nn
-# 
-# fitProbNN <- predict(nn, Test, type = "prob") 
-# head(fitProbNN)
-# 
-# fitProbNN1 <- fitProbNN$"1"
-# 
-# par(pty = "s") 
-# roc(Test$CRASH, fitProbNN1, plot=TRUE, legacy.axes=TRUE, col="#377eb8", 
-#     print.auc=TRUE)
-# 
-# 
-# ## ROC: GLM & NN 
-# par(pty = "s") 
-# roc(Test$CRASH, fitProb1, plot=TRUE, legacy.axes=TRUE, col="#377eb8", 
-#     print.auc=TRUE)
-# 
-# roc(Test$CRASH, fitProbNN1, plot=TRUE, legacy.axes=TRUE,  col="#4daf4a", 
-#     add=TRUE, print.auc=TRUE, print.auc.y=0.4)
-# 
-# legend("bottomright", legend=c("GLM Model", 
-#                                "NN Model"), 
-#        col=c("#377eb8", "#4daf4a"), lwd=3)
-
 
 
 
