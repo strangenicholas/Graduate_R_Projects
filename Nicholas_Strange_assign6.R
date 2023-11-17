@@ -1,3 +1,11 @@
+library(dplyr) 
+library(haven)
+library(ggplot2) 
+library(caret) 
+library(pROC) 
+library(randomForest)
+
+
 # Construct the average Industry concentration and Profit margins (PMs) for the firms
 # in all three-digit industries each year SIC3 YEAR (note that you need to construct the
 # variable SIC3 by taking the first three digits of an SIC code). PMs are defined above. By
@@ -9,3 +17,11 @@
 # 2. Identify the 5 largest firms in terms of SLS (if there are less than 5 years, identify all of
 # them).
 # 3. Construct
+
+## Read in data
+cmpst <-
+  read_sas("C:/Users/nicho/OneDrive/UCF MS - FinTech/FIN 6779/compst7018.sas7bdat")
+as.data.frame(cmpst)
+
+head(cmpst)
+summary(cmpst) 
