@@ -70,16 +70,23 @@ cmpst <-
 # summary(cmpst)
 
 
-View(cmpst)
+# View(cmpst)
 
 # Get top 5 firms concentrations
 
 top5_sales <- cmpst %>%
   group_by(SIC3, year, PERMNO) %>%
-  summarise(top5SLS = sum(cmpst$SLS)) %>%
-  arrange(desc(cmpst$SLS)) %>%
-  slice_head(n = 5)
-
+  summarise(total_SLS = sum(SLS)) %>%
+  arrange(desc(total_SLS)) %>%
+  group_by(SIC3) %>%
+  slice_head(n = 5) %>%
+  summarise(sum_of_top5_SLS = sum(total_SLS),
+            sum_of_all_SLS = sum(SLS))
   
-View(cmpst2)
+  
+
+
+
+head(top5_sales)
+View(top5_sales)
 
