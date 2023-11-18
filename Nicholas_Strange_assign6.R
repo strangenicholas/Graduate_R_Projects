@@ -23,5 +23,48 @@ cmpst <-
   read_sas("C:/Users/nicho/OneDrive/UCF MS - FinTech/FIN 6779/compst7018.sas7bdat")
 as.data.frame(cmpst)
 
-head(cmpst)
-summary(cmpst) 
+# head(cmpst)
+# summary(cmpst) 
+
+# Replace some negative values with missing 
+cmpst <- 
+  cmpst %>% 
+  mutate(CA = replace(CA, CA <= 0, NA), 
+         INTAN = replace(INTAN, INTAN <= 0, NA), 
+         INVT = replace(INVT, INVT <= 0, NA), 
+         SLS = replace(SLS, SLS <= 0, NA), 
+         CASH = replace(CASH, CASH <= 0, NA), 
+         INTXP = replace(INTXP, INTXP <= 0, NA), 
+         DIV = replace(DIV, DIV <= 0, NA), 
+         RD = replace(RD, RD <= 0, 0), 
+         CAPEX = replace(CAPEX, CAPEX <= 0, NA), 
+         BVA = replace(BVA, BVA <= 0, NA), 
+         BVE = replace(BVE, BVE <= 0, NA),    
+         TLIAB = replace(TLIAB, TLIAB <= 0, NA)) 
+
+# Filter the data and construct ratios 
+cmpst <- 
+  cmpst %>% 
+  arrange(PERMNO, year) %>% 
+  mutate(CHECK = BVA-TLIAB-BVE) %>%  
+  filter(CHECK > -0.1 & CHECK < 0.1) %>% 
+  mutate(ROA=NI/BVA, 
+         RD = if_else(is.na(RD), 0, RD), 
+         RDA=RD/BVA, RDIND=sign(RD),  
+         SIC2CHAR=substr(SIC, 1, 2), SIC2=as.numeric(SIC2CHAR)) %>% 
+  select(PERMNO, cname, year, SIC, SIC2, FYR, ROA, NI, BVA, SLS, 
+         RD, RDA, RDIND) 
+
+# head(cmpst)
+# summary(cmpst) 
+
+
+## Winsorize ratios 
+library(statar) 
+cmpst <- 
+  cmpst %>% 
+  mutate(ROA=winsorize(ROA, probs = c(0.01, 0.99)), 
+         RDA=winsorize(RDA, probs = c(0.01, 0.99)))
+
+# head(cmpst)
+# summary(cmpst)
