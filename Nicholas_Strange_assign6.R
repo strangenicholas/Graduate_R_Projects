@@ -66,7 +66,7 @@ cmpst <-
   mutate(ROA=winsorize(ROA, probs = c(0.01, 0.99)), 
          RDA=winsorize(RDA, probs = c(0.01, 0.99)))
 
-# head(cmpst)
+head(cmpst)
 # summary(cmpst)
 
 
@@ -75,18 +75,24 @@ cmpst <-
 # Get top 5 firms concentrations
 
 top5_sales <- cmpst %>%
-  group_by(SIC3, year, PERMNO) %>%
-  summarise(total_SLS = sum(SLS)) %>%
-  arrange(desc(total_SLS)) %>%
-  group_by(SIC3) %>%
+  group_by(SIC3, year) %>%
+  arrange(desc(SLS)) %>%
   slice_head(n = 5) %>%
-  summarise(sum_of_top5_SLS = sum(total_SLS),
-            sum_of_all_SLS = sum(SLS))
-  
+  summarise(sum_of_top5_SLS = sum(SLS))
   
 
+totalSLS <- cmpst %>%
+  group_by(SIC3, year) %>%
+  summarise(total_SLS = sum(SLS) , PM = sum(NI * SLS) / sum(SLS)) ## look into whether this is correct place to put PM
+
+combined_table <- left_join(top5_sales, totalSLS, by = c("SIC3", "year")) %>%
+  mutate(IC = sum_of_top5_SLS / total_SLS)
+# select(year, SIC3, IC, PM)
 
 
-head(top5_sales)
-View(top5_sales)
+head(combined_table)
+
+
+
+
 
