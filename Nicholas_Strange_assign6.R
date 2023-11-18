@@ -92,7 +92,27 @@ combined_table <- left_join(top5_sales, totalSLS, by = c("SIC3", "year")) %>%
 
 head(combined_table)
 
+# Correlation of IC & PM
 
+corr_alltime <- cor(combined_table$IC, combined_table$PM, use = "complete.obs")
+
+corr_alltime
+
+cor_over_time <- combined_table %>%
+  group_by(year) %>%
+  summarise(cor_over_time = cor(IC, PM, use = "complete.obs"))
+
+cor_over_time
+
+cor_tab <- data.frame(
+  Correlation_Type = c("Overall", "Over Time"),
+  Correlation_Value = c(corr_alltime, cor_over_time$cor_over_time)
+)
+
+ggplot(cor_tab, aes(x = Correlation_Type, y = Correlation_Value, fill = Correlation_Type)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Correlation of IC and PM", y = "Correlation Value") +
+  theme_minimal()
 
 
 
