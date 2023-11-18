@@ -51,8 +51,8 @@ cmpst <-
   mutate(ROA=NI/BVA, 
          RD = if_else(is.na(RD), 0, RD), 
          RDA=RD/BVA, RDIND=sign(RD),  
-         SIC2CHAR=substr(SIC, 1, 2), SIC2=as.numeric(SIC2CHAR)) %>% 
-  select(PERMNO, cname, year, SIC, SIC2, FYR, ROA, NI, BVA, SLS, 
+         SIC3CHAR=substr(SIC, 1, 3), SIC3=as.numeric(SIC3CHAR)) %>% 
+  select(PERMNO, cname, year, SIC, SIC3, FYR, ROA, NI, BVA, SLS, 
          RD, RDA, RDIND) 
 
 # head(cmpst)
@@ -68,3 +68,18 @@ cmpst <-
 
 # head(cmpst)
 # summary(cmpst)
+
+
+View(cmpst)
+
+# Get top 5 firms concentrations
+
+top5_sales <- cmpst %>%
+  group_by(SIC3, year, PERMNO) %>%
+  summarise(top5SLS = sum(cmpst$SLS)) %>%
+  arrange(desc(cmpst$SLS)) %>%
+  slice_head(n = 5)
+
+  
+View(cmpst2)
+
