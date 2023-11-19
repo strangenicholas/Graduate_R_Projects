@@ -95,25 +95,37 @@ head(combined_table)
 
 # Correlation of IC & PM
 
-corr_alltime <- cor(combined_table$IC, combined_table$PMW, use = "complete.obs")
+corr_alltime <-
+  cor(combined_table$IC, combined_table$PMW, use = "complete.obs")
 
 corr_alltime
 
-cor_over_time <- combined_table %>%
+corr_over_time <- combined_table %>%
   group_by(year) %>%
   summarise(cor_over_time = cor(IC, PMW, use = "complete.obs"))
 
-cor_over_time
+corr_over_time
 
-cor_tab <- data.frame(
-  Correlation_Type = c("Overall", "Over Time"),
-  Correlation_Value = c(corr_alltime, cor_over_time$cor_over_time)
-)
 
-ggplot(cor_tab, aes(x = Correlation_Type, y = Correlation_Value, fill = Correlation_Type)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  labs(title = "Correlation of IC and PM", y = "Correlation Value") +
-  theme_minimal()
+# Visualize All Time
+plot(combined_table$IC, combined_table$PMW, 
+     xlab = "IC", ylab = "PMW",
+     main = "Scatterplot of IC vs PMW")
+
+# Add a regression line
+abline(lm(combined_table$PMW ~ combined_table$IC), col = "red")
+
+# Print cc
+text(x = max(combined_table$IC), y = max(combined_table$PMW),
+     labels = paste("Correlation =", round(corr_alltime, 2)), pos = 1)
+
+# Visualize overtime
+ggplot(corr_over_time, aes(x = year, y = cor_over_time)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Correlation Over Time",
+       x = "Year",
+       y = "Correlation (IC vs PMW)")
 
 
 
