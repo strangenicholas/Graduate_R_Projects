@@ -51,9 +51,10 @@ cmpst <-
   mutate(ROA=NI/BVA, 
          RD = if_else(is.na(RD), 0, RD), 
          RDA=RD/BVA, RDIND=sign(RD),  
-         SIC3CHAR=substr(SIC, 1, 3), SIC3=as.numeric(SIC3CHAR)) %>% 
+         SIC3CHAR=substr(SIC, 1, 3), SIC3=as.numeric(SIC3CHAR),
+         PM = NI/SLS) %>% 
   select(PERMNO, cname, year, SIC, SIC3, FYR, ROA, NI, BVA, SLS, 
-         RD, RDA, RDIND) 
+         RD, RDA, RDIND, PM) 
 
 # head(cmpst)
 # summary(cmpst) 
@@ -83,7 +84,7 @@ top5_sales <- cmpst %>%
 
 totalSLS <- cmpst %>%
   group_by(SIC3, year) %>%
-  summarise(total_SLS = sum(SLS) , PM = sum(NI * SLS) / sum(SLS)) ## look into whether this is correct place to put PM
+  summarise(total_SLS = sum(SLS) , PMW = weighted.mean(PM, SLS, na.rm = TRUE)) 
 
 combined_table <- left_join(top5_sales, totalSLS, by = c("SIC3", "year")) %>%
   mutate(IC = sum_of_top5_SLS / total_SLS)
@@ -94,13 +95,13 @@ head(combined_table)
 
 # Correlation of IC & PM
 
-corr_alltime <- cor(combined_table$IC, combined_table$PM, use = "complete.obs")
+corr_alltime <- cor(combined_table$IC, combined_table$PMW, use = "complete.obs")
 
 corr_alltime
 
 cor_over_time <- combined_table %>%
   group_by(year) %>%
-  summarise(cor_over_time = cor(IC, PM, use = "complete.obs"))
+  summarise(cor_over_time = cor(IC, PMW, use = "complete.obs"))
 
 cor_over_time
 
