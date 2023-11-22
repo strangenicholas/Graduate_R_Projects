@@ -73,7 +73,7 @@ head(cmpst)
 
 # View(cmpst)
 
-# Get top 5 firms concentrations
+# Get top 5 firm concentration
 
 top5_sales <- cmpst %>%
   group_by(SIC3, year) %>%
@@ -108,11 +108,11 @@ corr_over_time
 
 
 # Visualize All Time
-plot(combined_table$IC, combined_table$PMW, 
+plot(combined_table$IC, combined_table$PMW,
      xlab = "IC", ylab = "PMW",
      main = "Scatterplot of IC vs PMW")
 
-# Add a regression line
+# Add regression line
 abline(lm(combined_table$PMW ~ combined_table$IC), col = "red")
 
 # Print cc
