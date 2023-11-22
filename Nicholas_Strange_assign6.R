@@ -88,8 +88,6 @@ totalSLS <- cmpst %>%
 
 combined_table <- left_join(top5_sales, totalSLS, by = c("SIC3", "year")) %>%
   mutate(IC = sum_of_top5_SLS / total_SLS)
-# select(year, SIC3, IC, PM)
-
 
 head(combined_table)
 
