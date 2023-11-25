@@ -77,10 +77,32 @@ demog <-
         )
       )
     ),
+    employed = if_else(EMPSTAT == 0, NA, EMPSTAT),
+    employed = if_else(employed == 1, 1, 0), 
+    hhincome = if_else(HHINCOME == 9999999,NA,HHINCOME),
+    totincome = if_else(INCTOT == 9999999,NA,INCTOT),
+    industry = if_else(IND1990 == 0, NA, IND1990,
+                       if_else(industry >= 1 & industry <= 32,'Agriculture',
+                               if_else(industry >= 40 & industry <= 50,'Mining'),
+                               if_else(industry == 60 ,'Construction'),
+                               if_else(industry >= 100 & industry <= 392,'Manufacturing'),
+                               if_else(industry >= 400 & industry <= 472,'Transportation'),
+                               if_else(industry >= 500 & industry <= 571,'Wholesale'),
+                               if_else(industry >= 580 & industry <= 691,'Retail'),
+                               if_else(industry >= 700 & industry <= 712,'Finance'),
+                               if_else(industry >= 721 & industry <= 760,'Business'),
+                               if_else(industry >= 761 & industry <= 791,'Personal Services'),
+                               if_else(industry >= 800 & industry <= 893,'Professional Services'),
+                               if_else(industry >= 900 & industry <= 932,'Public Admin'),
+                               if_else(industry >= 940 & industry <= 960,'Military'),
+                               if_else(industry > 960,'Other')
+                               )
+                       ),
+    
     
   ) %>%
          # )
-select(homeown, iscitizen, edulvl, ancestry)  
+select(homeown, iscitizen, edulvl, ancestry, employed, hhincome, totincome, industry)  
 
 View(demog)
 
