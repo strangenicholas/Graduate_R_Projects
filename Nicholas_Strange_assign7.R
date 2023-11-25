@@ -32,39 +32,39 @@ demog <-
       ANCESTR1 >= 1 & ANCESTR1 <= 98,
       'Western Europe',
       if_else(
-        ancestry >= 100 & ancestry <= 179,
+        ANCESTR1 >= 100 & ANCESTR1 <= 179,
         'Eastern Europe',
         if_else(
-          ancestry >= 181 & ancestry <= 195,
+          ANCESTR1 >= 181 & ANCESTR1 <= 195,
           'Europe NEC',
           if_else(
-            ancestry >= 200 & ancestry <= 296,
+            ANCESTR1 >= 200 & ANCESTR1 <= 296,
             'Hispanic',
             if_else(
-              ancestry >= 300 & ancestry <= 337,
+              ANCESTR1 >= 300 & ANCESTR1 <= 337,
               'West Indies',
               if_else(
-                ancestry >= 360 & ancestry <= 380,
+                ANCESTR1 >= 360 & ANCESTR1 <= 380,
                 'Central & South America',
                 if_else(
-                  ancestry >= 400 & ancestry <= 496,
+                  ANCESTR1 >= 400 & ANCESTR1 <= 496,
                   'North Africa & SW Asia',
                   if_else(
-                    ancestry >= 500 & ancestry <= 599,
+                    ANCESTR1 >= 500 & ANCESTR1 <= 599,
                     'Subsaharan Africa',
                     if_else(
-                      ancestry >= 600 & ancestry <= 695,
+                      ANCESTR1 >= 600 & ANCESTR1 <= 695,
                       'South Asia',
                       if_else(
-                        ancestry >= 700 & ancestry <= 796,
+                        ANCESTR1 >= 700 & ANCESTR1 <= 796,
                         'Other Asia',
                         if_else(
-                          ancestry >= 800 & ancestry <= 870,
+                          ANCESTR1 >= 800 & ANCESTR1 <= 870,
                           'Pacific',
                           if_else(
-                            ancestry >= 900 & ancestry <= 994,
+                            ANCESTR1 >= 900 & ANCESTR1 <= 994,
                             'North America',
-                            if_else(ancestry >= 995, 'Other', ancestry)
+                            if_else(ANCESTR1 >= 995, 'Other', as.character(ANCESTR1))
                           )
                         )
                       )
@@ -81,27 +81,37 @@ demog <-
     employed = if_else(employed == 1, 1, 0), 
     hhincome = if_else(HHINCOME == 9999999,NA,HHINCOME),
     totincome = if_else(INCTOT == 9999999,NA,INCTOT),
-    industry = if_else(IND1990 == 0, NA, IND1990,
-                       if_else(industry >= 1 & industry <= 32,'Agriculture',
-                               if_else(industry >= 40 & industry <= 50,'Mining'),
-                               if_else(industry == 60 ,'Construction'),
-                               if_else(industry >= 100 & industry <= 392,'Manufacturing'),
-                               if_else(industry >= 400 & industry <= 472,'Transportation'),
-                               if_else(industry >= 500 & industry <= 571,'Wholesale'),
-                               if_else(industry >= 580 & industry <= 691,'Retail'),
-                               if_else(industry >= 700 & industry <= 712,'Finance'),
-                               if_else(industry >= 721 & industry <= 760,'Business'),
-                               if_else(industry >= 761 & industry <= 791,'Personal Services'),
-                               if_else(industry >= 800 & industry <= 893,'Professional Services'),
-                               if_else(industry >= 900 & industry <= 932,'Public Admin'),
-                               if_else(industry >= 940 & industry <= 960,'Military'),
-                               if_else(industry > 960,'Other')
-                               )
-                       ),
+    industry = if_else(
+      IND1990 == 0, NA,
+      if_else(IND1990 >= 1 & IND1990 <= 32, 'Agriculture',
+              if_else(IND1990 >= 40 & IND1990 <= 50, 'Mining',
+                      if_else(IND1990 == 60, 'Construction',
+                              if_else(IND1990 >= 100 & IND1990 <= 392, 'Manufacturing',
+                                      if_else(IND1990 >= 400 & IND1990 <= 472, 'Transportation',
+                                              if_else(IND1990 >= 500 & IND1990 <= 571, 'Wholesale',
+                                                      if_else(IND1990 >= 580 & IND1990 <= 691, 'Retail',
+                                                              if_else(IND1990 >= 700 & IND1990 <= 712, 'Finance',
+                                                                      if_else(IND1990 >= 721 & IND1990 <= 760, 'Business',
+                                                                              if_else(IND1990 >= 761 & IND1990 <= 791, 'Personal Services',
+                                                                                      if_else(IND1990 >= 800 & IND1990 <= 893, 'Professional Services',
+                                                                                              if_else(IND1990 >= 900 & IND1990 <= 932, 'Public Admin',
+                                                                                                      if_else(IND1990 >= 940 & IND1990 <= 960, 'Military', 'Other')
+                                                                                              )
+                                                                                      )
+                                                                              )
+                                                                      )
+                                                              )
+                                                      )
+                                              )
+                                      )
+                              )
+                      )
+              )
+      )
+    ),
     
     
   ) %>%
-         # )
 select(homeown, iscitizen, edulvl, ancestry, employed, hhincome, totincome, industry)  
 
 View(demog)
