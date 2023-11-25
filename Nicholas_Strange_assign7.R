@@ -11,6 +11,8 @@ library(dplyr)
 library(haven)
 
 ## Read in data
-cmpst <-
+dems <-
   read_sas("C:/Users/nicho/OneDrive/UCF MS - FinTech/FIN 6779/nj2000.sas7bdat")
-as.data.frame(cmpst)
+as.data.frame(dems)
+
+head(dems)
