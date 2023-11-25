@@ -11,8 +11,20 @@ library(dplyr)
 library(haven)
 
 ## Read in data
-dems <-
+demog <-
   read_sas("C:/Users/nicho/OneDrive/UCF MS - FinTech/FIN 6779/nj2000.sas7bdat")
 as.data.frame(dems)
 
-head(dems)
+# Remove duplicate records
+demog %>% distinct()
+
+demog <- filter(demog, METAREA == 616 & OWNERSHP != 0) #filter to PA/NJ and remove NA ownership
+
+demog <- 
+  dems %>%
+  mutate(homeown = if_else(OWNERSHP == 1,1,0))
+  
+
+# View(dems)
+
+# Predict Home Ownership
