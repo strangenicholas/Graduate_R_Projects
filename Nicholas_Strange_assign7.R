@@ -109,13 +109,13 @@ demog <-
               )
       )
     ),
-    occupantion = if_else(occ1990 >= 3 & occ1990 <= 200, 'Managerial & Professional', 
-      if_else(occ1990 >= 203 & occ1990 <= 389, 'Technical, Sales & Admin',
-              if_else(occ1990 >= 405 & occ1990 <= 469, 'Service',
-                      if_else(occ1990 >= 473 & occ1990 <= 498, 'Farming, Forestry & Fishing',
-                              if_else(occ1990 >= 503 & occ1990 <= 699, 'Production, Craft & Repair',
-                                      if_else(occ1990 >= 703 & occ1990 <= 889, 'Operators, Fabricators & Laborers',
-                                              if_else(occ1990 = 905 , 'Military','Other'))))))),
+    occupation = if_else(OCC1990 >= 3 & OCC1990 <= 200, 'Managerial & Professional', 
+      if_else(OCC1990 >= 203 & OCC1990 <= 389, 'Technical, Sales & Admin',
+              if_else(OCC1990 >= 405 & OCC1990 <= 469, 'Service',
+                      if_else(OCC1990 >= 473 & OCC1990 <= 498, 'Farming, Forestry & Fishing',
+                              if_else(OCC1990 >= 503 & OCC1990 <= 699, 'Production, Craft & Repair',
+                                      if_else(OCC1990 >= 703 & OCC1990 <= 889, 'Operators, Fabricators & Laborers',
+                                              if_else(OCC1990 == 905 , 'Military','Other'))))))),
     married = if_else(MARST %in% c(1,2), 1, 0), #may add divorced, in case home purchased when married
     # migrated = 
     travtime = if_else(TRANTIME == 000,NA,TRANTIME),
@@ -123,8 +123,51 @@ demog <-
     
     
   ) %>%
-select(homeown, iscitizen, edulvl, ancestry, employed, hhincome, totincome, industry, occupantion, married, travtime, SEX)  
+select(homeown, iscitizen, edulvl, ancestry, employed, hhincome, totincome, industry, occupation, married, travtime, SEX)  
 
 View(demog)
 
 # Predict Home Ownership
+
+## Non-linear regression
+fit <-
+  lm(
+    homeown ~  iscitizen + edulvl + ancestry + employed + hhincome 
+    + totincome + industry + occupation + married + travtime + SEX,
+    data = demog
+  )
+summary(fit) # show results 
+
+fitNLR <- lm(homeown ~  iscitizen + edulvl + ancestry + hhincome + married,
+             data = demog)
+summary(fitNLR) # show results 
+
+####### Logistic regression   
+fitLgR <- glm(homeown ~  iscitizen + edulvl + ancestry + employed + hhincome + totincome + industry + occupation + married + travtime + SEX, 
+              family = "binomial", data = demog)
+summary(fitLgR)  
+
+
+####### Decision tree  
+library(rpart)
+library(rpart.plot)
+
+fit3 <- lm(    homeown ~  iscitizen + edulvl + ancestry + employed + hhincome 
+               + totincome + industry + occupation + married + travtime + SEX,
+               data = demog)
+summary(fit3) # show results 
+
+dt <- rpart(    homeown ~  iscitizen + edulvl + ancestry + employed + hhincome 
+                + totincome + industry + occupation + married + travtime + SEX,
+                data = demog)
+summary(dt) 
+# Plot the decision tree 
+prp(dt, space=4, split.cex=1.5, nn.border.col=0)
+
+
+####### CARET: Predicting homeownership
+demog2 <- 
+  demog %>% 
+  select(homeown, iscitizen, edulvl, ancestry, employed, hhincome, totincome, industry, occupation, married, travtime, SEX) %>% 
+  mutate(homeown = as.factor(homeown))
+summary(homeown) 
