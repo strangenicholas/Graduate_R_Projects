@@ -115,11 +115,15 @@ demog <-
                       if_else(occ1990 >= 473 & occ1990 <= 498, 'Farming, Forestry & Fishing',
                               if_else(occ1990 >= 503 & occ1990 <= 699, 'Production, Craft & Repair',
                                       if_else(occ1990 >= 703 & occ1990 <= 889, 'Operators, Fabricators & Laborers',
-                                              if_else(occ1990 = 905 , 'Military','Other')))))))
+                                              if_else(occ1990 = 905 , 'Military','Other'))))))),
+    married = if_else(MARST %in% c(1,2), 1, 0), #may add divorced, in case home purchased when married
+    # migrated = 
+    travtime = if_else(TRANTIME == 000,NA,TRANTIME),
+    
     
     
   ) %>%
-select(homeown, iscitizen, edulvl, ancestry, employed, hhincome, totincome, industry, occupantion)  
+select(homeown, iscitizen, edulvl, ancestry, employed, hhincome, totincome, industry, occupantion, married, travtime, SEX)  
 
 View(demog)
 
