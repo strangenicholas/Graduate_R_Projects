@@ -109,10 +109,17 @@ demog <-
               )
       )
     ),
+    occupantion = if_else(occ1990 >= 3 & occ1990 <= 200, 'Managerial & Professional', 
+      if_else(occ1990 >= 203 & occ1990 <= 389, 'Technical, Sales & Admin',
+              if_else(occ1990 >= 405 & occ1990 <= 469, 'Service',
+                      if_else(occ1990 >= 473 & occ1990 <= 498, 'Farming, Forestry & Fishing',
+                              if_else(occ1990 >= 503 & occ1990 <= 699, 'Production, Craft & Repair',
+                                      if_else(occ1990 >= 703 & occ1990 <= 889, 'Operators, Fabricators & Laborers',
+                                              if_else(occ1990 = 905 , 'Military','Other')))))))
     
     
   ) %>%
-select(homeown, iscitizen, edulvl, ancestry, employed, hhincome, totincome, industry)  
+select(homeown, iscitizen, edulvl, ancestry, employed, hhincome, totincome, industry, occupantion)  
 
 View(demog)
 
