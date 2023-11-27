@@ -168,8 +168,6 @@ demog <-
       )
     ),
     married = if_else(MARST %in% c(1, 2), 1, 0),
-    #may add divorced, in case home purchased when married
-    # migrated =
     travtime = if_else(TRANTIME == 000, NA, TRANTIME),
     
     
@@ -305,7 +303,7 @@ getModelInfo("glm")
 
 varimpGLM = varImp(glm)
 varimpGLM
-plot(varimpGLM, main = "Mret Variable Importance: GLM")
+plot(varimpGLM, main = "demog Variable Importance: GLM")
 
 ### Creating ROC curves
 # Output the probabilities for 1
@@ -498,7 +496,7 @@ glm
 
 varimpGLM = varImp(glm)
 varimpGLM
-plot(varimpGLM, main = "MRET Variable Importance: GLM")
+plot(varimpGLM, main = "demog Variable Importance: GLM")
 
 
 # Drop unimportant variables
