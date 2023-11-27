@@ -283,8 +283,8 @@ inTrain <-
   createDataPartition(demog2$homeown, p = .70, list = FALSE)
 inTrain[1:10]
 
-Train <- demog2[inTrain, ]
-Test  <- demog2[-inTrain, ]
+Train <- demog2[inTrain,]
+Test  <- demog2[-inTrain,]
 summary(Train)
 summary(Test)
 
