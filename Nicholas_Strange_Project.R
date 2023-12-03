@@ -20,6 +20,9 @@ mret <- mret %>%
 # Remove duplicate records
 mret %>% distinct()
 
+# Filter years
+mret <- filter(mret, year >= 1970 & year <= 1980 )
+
 
 # Read in Names data
 names <-
@@ -74,11 +77,9 @@ View(matches)
 # Matching names mret
 namesmret <- filter(mret, COMNAM %in% matches)
 
+
 # Non-matching names mret
 nonamesmret <- mret[!(mret$COMNAM %in% matches), ]
-
-# Filter years
-mret <- filter(mret, year >= 1970 & year <= 1980 )
 
 
 # Calculate Returns
@@ -99,6 +100,15 @@ nonamesmret2 <-
   group_by(DATE) %>%
   summarize(VWRETD = mean(VWRETD, na.rm = TRUE))
 
+# Get avg return
+average_VWRETD <- mean(mret2$VWRETD, na.rm = TRUE)
+print(average_VWRETD)
+
+average_VWRETD <- mean(namesmret2$VWRETD, na.rm = TRUE)
+print(average_VWRETD)
+
+average_VWRETD <- mean(nonamesmret2$VWRETD, na.rm = TRUE)
+print(average_VWRETD)
 
 # Combine the three data frames into one for plotting
 combined_data <- bind_rows(
