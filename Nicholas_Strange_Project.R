@@ -14,15 +14,18 @@ mret <- filter(mret, SHRCD %in% c(10,11))
 # Remove duplicate records
 mret %>% distinct()
 
+mret
+
 # Read in Names data
 names <-
   read.csv("C:/Users/nicho/OneDrive/UCF MS - FinTech/FIN 6779/Names.csv")
 as.data.frame(names)
 
 # Get top 10 names
-names
+names10 <- head(names, 10)
+  
 # Get distinct company names
-compnames <- unique(mret[["COMNAM"]])
+compnames <- distinct(mret,PERMCO, COMNAM)
 
 compnames
 
@@ -41,37 +44,33 @@ matches <- data_frame()
 
 
 # Initialize an empty list to store matches
-matches <- logical(nrow(names))
+matches <- logical(nrow(names10))
 
 # Loop through each row in 'names'
-for (i in 1:nrow(names)) {
+for (i in 1:nrow(names10)) {
   # Check if any keyword is present in the current row
-  if (names[i, "name"] %in% compnames) {
+  if (names10[i, "name"] %in% compnames) {
     matches[i] <- TRUE
   }
 }
 
-# Subsstring
-for (i in 1:nrow(names)) {
-  # Check if any keyword is present in the current row
-  if (names[i, "name"] %in% str_detect(compnames$COMNAM, name)) {
-    matches[i] <- TRUE
-  }
+# Loop through each row in 'names10'
+for (i in 1:nrow(names10)) { 
+  if (str_detect(names10[i, "name"],compnames) = TRUE) {
+  matches[i] <- TRUE
 }
+}
+
+  # Check if any keyword is present in 'compnames'
+  matches <- compnames[str_detect(compnames, names10[i, "name"])]
+  matches[i] <- compnames$comnam
 
 # Subset df1 based on matches
-result_df <- names[matches, ]
+result_df <- names10[matches, ]
 
 # Print the result
 print(result_df)
 
-
-
-
-
-# get distinct matches
-# 
-# nomatch <-  unique names that are not in matches
   
 
 
