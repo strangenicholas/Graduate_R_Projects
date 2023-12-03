@@ -3,18 +3,23 @@
 library(dplyr)
 library(haven)
 library(stringr)
+library(ggplot2)
 
 ## Read in Market Return data
 mret <-
   read_sas("C:/Users/nicho/OneDrive/UCF MS - FinTech/FIN 6779/mret7018.sas7bdat")
 as.data.frame(mret)
 
-mret <- filter(mret, SHRCD %in% c(10,11)) 
+mret <- mret %>%
+  mutate(
+    year = as.numeric(format(DATE, "%Y")),
+    month = as.numeric(format(DATE, "%m"))
+  ) %>%
+  filter(SHRCD %in% c(10, 11)) 
 
 # Remove duplicate records
 mret %>% distinct()
 
-mret
 
 # Read in Names data
 names <-
@@ -29,7 +34,7 @@ names10 <- head(names, 10)
 compnames <- distinct(mret,PERMCO, COMNAM)
 
 
-#Psudo code
+#Psuedo code
 # for name in names:
 #   if str names = colomn in compnames:
 #   matches.append compnames[comnam]
@@ -66,14 +71,49 @@ for (i in 1:nrow(names10)) {
 # Print the result
 View(matches)
 
-class(matches)
-
-
 # Matching names mret
 namesmret <- filter(mret, COMNAM %in% matches)
 
 # Non-matching names mret
 nonamesmret <- mret[!(mret$COMNAM %in% matches), ]
+
+# Filter years
+mret <- filter(mret, year >= 1970 & year <= 1980 )
+
+
+# Calculate Returns
+mret2 <-
+  mret %>%
+  group_by(DATE) %>%
+  summarize(VWRETD = mean(VWRETD, na.rm = TRUE))
+
+
+namesmret2 <-
+  namesmret %>%
+  group_by(DATE) %>%
+  summarize(VWRETD = mean(VWRETD, na.rm = TRUE))
+
+
+nonamesmret2 <-
+  nonamesmret %>%
+  group_by(DATE) %>%
+  summarize(VWRETD = mean(VWRETD, na.rm = TRUE))
+
+
+# Combine the three data frames into one for plotting
+combined_data <- bind_rows(
+  mutate(mret2, Group = "All Companies"),
+  mutate(namesmret2, Group = "Named Companies"),
+  mutate(nonamesmret2, Group = "Unnamed Companies")
+)
+
+# Plotting
+ggplot(combined_data, aes(x = DATE, y = VWRETD, color = Group)) +
+  geom_line() +
+  labs(title = "Mean VWRETD Over Time",
+       x = "Date",
+       y = "Mean VWRETD") +
+  theme_minimal()
 
 
 
