@@ -11,6 +11,7 @@ mret <-
 as.data.frame(mret)
 
 mret <- mret %>%
+  group_by(PERMNO) %>%
   mutate(
     year = as.numeric(format(DATE, "%Y")),
     month = as.numeric(format(DATE, "%m"))
@@ -20,8 +21,8 @@ mret <- mret %>%
 # Remove duplicate records
 mret %>% distinct()
 
-# Filter years -- TBD(haven't decided on this yet)
-mret <- filter(mret, year >= 1990 & year <= 2000 )
+# # Filter years -- TBD(haven't decided on this yet)
+mret <- filter(mret, year >= 1990 & year <= 2020 )
 
 # Read in Names data
 names <-
@@ -69,6 +70,13 @@ for (i in 1:nrow(names10)) {
 }             
 
 # Find substrings in compnames TBD
+for (i in 1:nrow(names10)) {
+  for (c in 1:nrow(compnames)) {
+    if (str_detect(compnames[c, "COMNAM"], substr(names10[i, "name"],0,))) {
+      matches <- append(matches, compnames[c, "COMNAM"])
+    }
+  }
+}      
 
 # # Print matches
 # View(matches)
@@ -78,30 +86,28 @@ namesmret <- filter(mret, COMNAM %in% matches)
 
 # Non-matching names mret
 nonamesmret <- mret[!(mret$COMNAM %in% matches), ]
-
-
 # Calculate Returns -- Need to fix, all return same values
 mret2 <- mret %>%
   group_by(DATE) %>%
-  summarise(VWRETD = mean(VWRETD, na.rm = TRUE))
+  summarise(RET = mean(RET, na.rm = TRUE))
 
 namesmret2 <- namesmret %>%
   group_by(DATE) %>%
-  summarise(VWRETD = mean(VWRETD, na.rm = TRUE))
+  summarise(RET = mean(RET, na.rm = TRUE))
 
 nonamesmret2 <- nonamesmret %>%
   group_by(DATE) %>%
-  summarise(VWRETD = mean(VWRETD, na.rm = TRUE))
+  summarise(RET = mean(RET, na.rm = TRUE))
 
 # Get avg return
-average_VWRETD <- mean(mret2$VWRETD, na.rm = TRUE)
-print(average_VWRETD)
+average_RET <- mean(mret2$RET, na.rm = TRUE)
+print(average_RET)
 
-average_VWRETD2 <- mean(namesmret2$VWRETD, na.rm = TRUE)
-print(average_VWRETD2)
+average_RETD2 <- mean(namesmret2$RET, na.rm = TRUE)
+print(average_RETD)
 
-average_VWRETD3 <- mean(nonamesmret2$VWRETD, na.rm = TRUE)
-print(average_VWRETD3)
+average_RETD3 <- mean(nonamesmret2$RET, na.rm = TRUE)
+print(average_RETD3)
 
 # Combine the df's for plotting
 combined_data <- bind_rows(
@@ -111,18 +117,12 @@ combined_data <- bind_rows(
 )
 
 # Plotting
-ggplot(combined_data, aes(x = DATE, y = VWRETD, color = Group)) +
+ggplot(combined_data, aes(x = DATE, y = RET, color = Group)) +
   geom_line() +
   labs(title = "Mean VWRETD Over Time",
        x = "Date",
        y = "Mean VWRETD") +
   theme_minimal()
-
-
-
-
-
-  
 
 
 
