@@ -72,14 +72,14 @@ for (i in 1:nrow(names10)) {
 # Find substrings in compnames TBD
 for (i in 1:nrow(names10)) {
   for (c in 1:nrow(compnames)) {
-    if (str_detect(compnames[c, "COMNAM"], substr(names10[i, "name"],0,))) {
+    if (str_detect(compnames[c, "COMNAM"], substr(names10[i, "name"],0,5))) {
       matches <- append(matches, compnames[c, "COMNAM"])
     }
   }
 }      
 
 # # Print matches
-# View(matches)
+View(matches)
 
 # Matching names mret
 namesmret <- filter(mret, COMNAM %in% matches)
@@ -88,41 +88,67 @@ namesmret <- filter(mret, COMNAM %in% matches)
 nonamesmret <- mret[!(mret$COMNAM %in% matches), ]
 # Calculate Returns -- Need to fix, all return same values
 mret2 <- mret %>%
+  group_by(DATE, COMNAM) %>%
+  summarise(ARET = mean(RET, na.rm = TRUE)) %>%
+  ungroup() %>%
   group_by(DATE) %>%
-  summarise(RET = mean(RET, na.rm = TRUE))
+  summarise(ARET = mean(ARET, na.rm = TRUE))
 
 namesmret2 <- namesmret %>%
+  group_by(DATE, COMNAM) %>%
+  summarise(ARET = mean(RET, na.rm = TRUE)) %>%
+  ungroup() %>%
   group_by(DATE) %>%
-  summarise(RET = mean(RET, na.rm = TRUE))
+  summarise(ARET = mean(ARET, na.rm = TRUE))
 
 nonamesmret2 <- nonamesmret %>%
+  group_by(DATE, COMNAM) %>%
+  summarise(ARET = mean(RET, na.rm = TRUE)) %>%
+  ungroup() %>%
   group_by(DATE) %>%
-  summarise(RET = mean(RET, na.rm = TRUE))
+  summarise(ARET = mean(ARET, na.rm = TRUE))
 
-# Get avg return
-average_RET <- mean(mret2$RET, na.rm = TRUE)
-print(average_RET)
-
-average_RETD2 <- mean(namesmret2$RET, na.rm = TRUE)
-print(average_RETD)
-
-average_RETD3 <- mean(nonamesmret2$RET, na.rm = TRUE)
-print(average_RETD3)
-
-# Combine the df's for plotting
+# Combine the df's for plotting hist return 
 combined_data <- bind_rows(
   mutate(mret2, Group = "All Companies"),
   mutate(namesmret2, Group = "Named Companies"),
   mutate(nonamesmret2, Group = "Unnamed Companies")
 )
 
-# Plotting
+# Plot
 ggplot(combined_data, aes(x = DATE, y = RET, color = Group)) +
   geom_line() +
   labs(title = "Mean VWRETD Over Time",
        x = "Date",
        y = "Mean VWRETD") +
   theme_minimal()
+
+# Get avg return
+avg_RET1 <- mean(mret2$ARET, na.rm = TRUE)
+print(avg_RET1)
+
+avg_RET2 <- mean(namesmret2$ARET, na.rm = TRUE)
+print(avg_RET2)
+
+avg_RET3 <- mean(nonamesmret2$ARET, na.rm = TRUE)
+print(avg_RET3)
+
+# DF for avg_RET
+avg_returns_data <- data.frame(
+  Dataset = c("mret2", "namesmret2", "nonamesmret2"),
+  Average_RET = c(avg_RET1, avg_RET2, avg_RET3)
+)
+
+# Bar plot
+ggplot(avg_returns_data, aes(x = Dataset, y = Average_RET, fill = Dataset)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = sprintf("%.4f", Average_RET)), vjust = -0.5) +  # Add value labels
+  labs(title = "Average Returns",
+       x = "Dataset",
+       y = "Average RET") +
+  theme_minimal()
+
+
 
 
 
