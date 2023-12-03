@@ -23,14 +23,11 @@ as.data.frame(names)
 
 # Get top 10 names
 names10 <- head(names, 10)
+
   
 # Get distinct company names
 compnames <- distinct(mret,PERMCO, COMNAM)
 
-compnames
-
-
-matches <- data_frame()
 
 #Psudo code
 # for name in names:
@@ -44,32 +41,34 @@ matches <- data_frame()
 
 
 # Initialize an empty list to store matches
-matches <- logical(nrow(names10))
+matches <- list()
 
-# Loop through each row in 'names'
+# Find perfect matches in compnames
 for (i in 1:nrow(names10)) {
-  # Check if any keyword is present in the current row
-  if (names10[i, "name"] %in% compnames) {
-    matches[i] <- TRUE
+  for (c in 1:nrow(compnames)) {
+    if (compnames[c, "COMNAM"] == names10[i, "name"]) {
+      matches <- append(matches, compnames[c, "COMNAM"])
+    }
   }
-}
+} 
 
-# Loop through each row in 'names10'
-for (i in 1:nrow(names10)) { 
-  if (str_detect(names10[i, "name"],compnames) = TRUE) {
-  matches[i] <- TRUE
-}
-}
 
-  # Check if any keyword is present in 'compnames'
-  matches <- compnames[str_detect(compnames, names10[i, "name"])]
-  matches[i] <- compnames$comnam
+# Find strings in compnames
+for (i in 1:nrow(names10)) {
+  for (c in 1:nrow(compnames)) {
+    if (str_detect(compnames[c, "COMNAM"], names10[i, "name"])) {
+      matches <- append(matches, compnames[c, "COMNAM"])
+    }
+  }
+}             
 
-# Subset df1 based on matches
-result_df <- names10[matches, ]
 
 # Print the result
-print(result_df)
+View(matches)
+
+
+
+
 
   
 
