@@ -21,8 +21,8 @@ mret <- mret %>%
 # Remove duplicate records
 mret %>% distinct()
 
-# # Filter years -- TBD(haven't decided on this yet)
-mret <- filter(mret, year >= 1990 & year <= 2020 )
+# # Filter years 
+mret <- filter(mret, year >= 2000 & year <= 2010 )
 
 # Read in Names data
 names <-
@@ -69,7 +69,7 @@ for (i in 1:nrow(names10)) {
   }
 }             
 
-# Find substrings in compnames TBD
+# Find substrings in compnames
 for (i in 1:nrow(names10)) {
   for (c in 1:nrow(compnames)) {
     if (str_detect(compnames[c, "COMNAM"], substr(names10[i, "name"],0,5))) {
@@ -86,7 +86,7 @@ namesmret <- filter(mret, COMNAM %in% matches)
 
 # Non-matching names mret
 nonamesmret <- mret[!(mret$COMNAM %in% matches), ]
-# Calculate Returns -- Need to fix, all return same values
+# Calculate Returns 
 mret2 <- mret %>%
   group_by(DATE, COMNAM) %>%
   summarise(ARET = mean(RET, na.rm = TRUE)) %>%
@@ -116,7 +116,7 @@ combined_data <- bind_rows(
 )
 
 # Plot
-ggplot(combined_data, aes(x = DATE, y = RET, color = Group)) +
+ggplot(combined_data, aes(x = DATE, y = ARET, color = Group)) +
   geom_line() +
   labs(title = "Mean VWRETD Over Time",
        x = "Date",
@@ -135,16 +135,15 @@ print(avg_RET3)
 
 # DF for avg_RET
 avg_returns_data <- data.frame(
-  Dataset = c("mret2", "namesmret2", "nonamesmret2"),
+  Dataset = c("Market", "Names", "NoNames"),
   Average_RET = c(avg_RET1, avg_RET2, avg_RET3)
 )
 
 # Bar plot
 ggplot(avg_returns_data, aes(x = Dataset, y = Average_RET, fill = Dataset)) +
   geom_bar(stat = "identity", position = "dodge") +
-  geom_text(aes(label = sprintf("%.4f", Average_RET)), vjust = -0.5) +  # Add value labels
+  geom_text(aes(label = sprintf("%.4f", Average_RET)), vjust = -0.5) +  
   labs(title = "Average Returns",
-       x = "Dataset",
        y = "Average RET") +
   theme_minimal()
 
