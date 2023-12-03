@@ -66,7 +66,14 @@ for (i in 1:nrow(names10)) {
 # Print the result
 View(matches)
 
+class(matches)
 
+
+# Matching names mret
+namesmret <- filter(mret, COMNAM %in% matches)
+
+# Non-matching names mret
+nonamesmret <- mret[!(mret$COMNAM %in% matches), ]
 
 
 
