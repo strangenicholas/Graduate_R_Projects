@@ -20,9 +20,8 @@ mret <- mret %>%
 # Remove duplicate records
 mret %>% distinct()
 
-# Filter years
-mret <- filter(mret, year >= 1970 & year <= 1980 )
-
+# Filter years -- TBD(haven't decided on this yet)
+mret <- filter(mret, year >= 1990 & year <= 2000 )
 
 # Read in Names data
 names <-
@@ -32,7 +31,6 @@ as.data.frame(names)
 # Get top 10 names
 names10 <- head(names, 10)
 
-  
 # Get distinct company names
 compnames <- distinct(mret,PERMCO, COMNAM)
 
@@ -48,10 +46,10 @@ compnames <- distinct(mret,PERMCO, COMNAM)
 # 
 
 
-# Initialize an empty list to store matches
+# Create empty listy to store matches
 matches <- list()
 
-# Find perfect matches in compnames
+# Find exact matches in compnames
 for (i in 1:nrow(names10)) {
   for (c in 1:nrow(compnames)) {
     if (compnames[c, "COMNAM"] == names10[i, "name"]) {
@@ -70,47 +68,42 @@ for (i in 1:nrow(names10)) {
   }
 }             
 
+# Find substrings in compnames TBD
 
-# Print the result
-View(matches)
+# # Print matches
+# View(matches)
 
 # Matching names mret
 namesmret <- filter(mret, COMNAM %in% matches)
-
 
 # Non-matching names mret
 nonamesmret <- mret[!(mret$COMNAM %in% matches), ]
 
 
-# Calculate Returns
-mret2 <-
-  mret %>%
+# Calculate Returns -- Need to fix, all return same values
+mret2 <- mret %>%
   group_by(DATE) %>%
-  summarize(VWRETD = mean(VWRETD, na.rm = TRUE))
+  summarise(VWRETD = mean(VWRETD, na.rm = TRUE))
 
-
-namesmret2 <-
-  namesmret %>%
+namesmret2 <- namesmret %>%
   group_by(DATE) %>%
-  summarize(VWRETD = mean(VWRETD, na.rm = TRUE))
+  summarise(VWRETD = mean(VWRETD, na.rm = TRUE))
 
-
-nonamesmret2 <-
-  nonamesmret %>%
+nonamesmret2 <- nonamesmret %>%
   group_by(DATE) %>%
-  summarize(VWRETD = mean(VWRETD, na.rm = TRUE))
+  summarise(VWRETD = mean(VWRETD, na.rm = TRUE))
 
 # Get avg return
 average_VWRETD <- mean(mret2$VWRETD, na.rm = TRUE)
 print(average_VWRETD)
 
-average_VWRETD <- mean(namesmret2$VWRETD, na.rm = TRUE)
-print(average_VWRETD)
+average_VWRETD2 <- mean(namesmret2$VWRETD, na.rm = TRUE)
+print(average_VWRETD2)
 
-average_VWRETD <- mean(nonamesmret2$VWRETD, na.rm = TRUE)
-print(average_VWRETD)
+average_VWRETD3 <- mean(nonamesmret2$VWRETD, na.rm = TRUE)
+print(average_VWRETD3)
 
-# Combine the three data frames into one for plotting
+# Combine the df's for plotting
 combined_data <- bind_rows(
   mutate(mret2, Group = "All Companies"),
   mutate(namesmret2, Group = "Named Companies"),
@@ -124,6 +117,8 @@ ggplot(combined_data, aes(x = DATE, y = VWRETD, color = Group)) +
        x = "Date",
        y = "Mean VWRETD") +
   theme_minimal()
+
+
 
 
 
